@@ -207,6 +207,20 @@ resource "azurerm_role_assignment" "example" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
+// Give aks the ability to read key-value pairs to the App Configuration instance
+resource "azurerm_role_assignment" "example_aks" {
+  scope                = azurerm_app_configuration.example.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id         = azurerm_kubernetes_cluster.example.identity[0].principal_id
+}
+
+// Give kubelet the ability to read key-value pairs to the App Configuration instance
+resource "azurerm_role_assignment" "example_kubelet" {
+  scope                = azurerm_app_configuration.example.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id         = azurerm_kubernetes_cluster.example.kubelet_identity[0].object_id
+}
+
 resource "azurerm_app_configuration_key" "example_settings_greeting" {
   configuration_store_id = azurerm_app_configuration.example.id
   key                    = "settings.greeting"
@@ -259,14 +273,25 @@ data "external" "aks_node_vmss" {
 // The local-exec provisioner is used because the VMSS is managed by AKS
 resource "null_resource" "rbac_appconfig_aks" {
   provisioner "local-exec" {
-    command = <<EOT
-      az vmss identity assign 
-      --role \"App Configuration Data Reader\" 
-      --scope ${azurerm_app_configuration.example.id} 
-      --name ${data.external.aks_node_vmss.result.name} 
-      --resource-group ${azurerm_kubernetes_cluster.example.node_resource_group}"
-    EOT
+    command = "az vmss identity assign --role \"App Configuration Data Reader\"  --scope ${azurerm_app_configuration.example.id} --name ${data.external.aks_node_vmss.result.name} --resource-group ${azurerm_kubernetes_cluster.example.node_resource_group}"
   }
+
+  depends_on = [
+    azurerm_app_configuration.example,
+    data.external.aks_node_vmss,
+    azurerm_kubernetes_cluster.example
+  ]
+}
+
+// sleep for 90 seconds to allow the managed identity to be created
+resource "null_resource" "sleep" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+
+  depends_on = [
+    null_resource.rbac_appconfig_aks
+  ]
 }
 
 // Get the object ID of the VMSS identity
@@ -281,7 +306,11 @@ data "external" "aks_node_vmss_identity_object_id" {
     "${data.external.aks_node_vmss.result.name}",
     "--resource-group",
     "${azurerm_kubernetes_cluster.example.node_resource_group}",
-    "--query", "{principalId: principalId}"
+    "--query", "{principal_id: principalId}"
+  ]
+
+  depends_on = [
+    null_resource.sleep
   ]
 }
 
@@ -294,17 +323,47 @@ data "external" "aks_node_vmss_identity_client_id" {
     "sp",
     "show",
     "--id",
-    "${data.external.aks_node_vmss_identity_object_id.result.principalId}",
+    "${data.external.aks_node_vmss_identity_object_id.result.principal_id}",
     "--query",
-    "{appId: appId}"
+    "{app_id: appId}"
   ]
+
+
+  depends_on = [
+    data.external.aks_node_vmss_identity_object_id
+  ]
+
 }
 
 // Give the VMSS identity the ability to read key-value pairs from the App Configuration instance
 resource "azurerm_key_vault_access_policy" "example" {
   key_vault_id = azurerm_key_vault.example.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.external.aks_node_vmss_identity_object_id.result.principalId
+  object_id    = data.external.aks_node_vmss_identity_object_id.result.principal_id
+
+  secret_permissions = [
+    "Get",
+    "List"
+  ]
+}
+
+// Give the aks identity the ability to read key-value pairs from the App Configuration instance
+resource "azurerm_key_vault_access_policy" "example_aks" {
+  key_vault_id = azurerm_key_vault.example.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_kubernetes_cluster.example.identity[0].principal_id
+
+  secret_permissions = [
+    "Get",
+    "List"
+  ]
+}
+
+// Give the kubelet identity the ability to read key-value pairs from the App Configuration instance
+resource "azurerm_key_vault_access_policy" "example_kubelet" {
+  key_vault_id = azurerm_key_vault.example.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_kubernetes_cluster.example.kubelet_identity[0].object_id
 
   secret_permissions = [
     "Get",
@@ -326,6 +385,17 @@ resource "helm_release" "appconfig_provider" {
   ]
 }
 
+// Sleep for 60 seconds to allow the App Configuration Kubernetes provider to deploy
+resource "null_resource" "sleep_again" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+
+  depends_on = [
+    helm_release.appconfig_provider
+  ]
+}
+
 // Get the Kubernetes cluster configuration and save the file to the current directory on the local machine
 resource "local_file" "example_aks_kubeconfig" {
   filename = "aks-kubeconfig"
@@ -338,9 +408,13 @@ resource "local_file" "example_appconfig_provider_manifest" {
   content = templatefile("sample-appconfig-provider.tpl",
     {
       APP_CONFIG_ENDPOINT         = azurerm_app_configuration.example.endpoint,
-      NODE_VMSS_MANAGED_CLIENT_ID = data.external.aks_node_vmss_identity_client_id.result.appId
+      NODE_VMSS_MANAGED_CLIENT_ID = data.external.aks_node_vmss_identity_client_id.result.app_id
     }
   )
+
+  depends_on = [
+    null_resource.sleep_again
+  ]
 }
 
 // Using the kubeconfig file, apply the AzureAppConfigurationProvider CRD deployment to the AKS cluster
@@ -348,13 +422,34 @@ resource "null_resource" "example_appconfig_provider_apply" {
   provisioner "local-exec" {
     command = "kubectl --kubeconfig ${local_file.example_aks_kubeconfig.filename} apply -f ${local_file.example_appconfig_provider_manifest.filename}"
   }
+
+  depends_on = [
+    null_resource.example_appconfig_provider_apply
+  ]
 }
+
+// sleep for 60 seconds to allow the AzureAppConfigurationProvider CRD deployment to deploy
+resource "null_resource" "sleep_one_last_time" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+
+  depends_on = [
+    null_resource.example_appconfig_provider_apply
+  ]
+}
+
 
 // Retrieve the configmap created by the AzureAppConfigurationProvider CRD deployment
 data "kubernetes_config_map" "example" {
   metadata {
     name = "my-configmap"
   }
+
+  depends_on = [
+    null_resource.example_appconfig_provider_apply,
+    null_resource.sleep_one_last_time
+  ]
 }
 
 // Retrieve the secret created by the AzureAppConfigurationProvider CRD deployment
@@ -362,6 +457,12 @@ data "kubernetes_secret" "example" {
   metadata {
     name = "my-secrets"
   }
+
+
+  depends_on = [
+    null_resource.example_appconfig_provider_apply,
+    null_resource.sleep_one_last_time
+  ]
 }
 
 resource "kubernetes_pod" "example" {
@@ -391,9 +492,13 @@ resource "kubernetes_pod" "example" {
           }
         }
       }
-
     }
   }
+
+  depends_on = [
+    data.kubernetes_config_map.example,
+    data.kubernetes_secret.example
+  ]
 }
 
 // Using the kubeconfig file, apply the AzureAppConfigurationProvider CRD deployment to the AKS cluster
@@ -408,25 +513,37 @@ resource "null_resource" "example_appconfig_provider_test" {
 }
 
 // Outputs
-# output "rg_name" {
-#   value = azurerm_resource_group.example.name
-# }
+output "rg_name" {
+  value = azurerm_resource_group.example.name
+}
 
-# output "aks_name" {
-#   value = azurerm_kubernetes_cluster.example.name
-# }
+output "aks_name" {
+  value = azurerm_kubernetes_cluster.example.name
+}
 
-# output "aks_node_vmss" {
-#   value = data.external.aks_node_vmss.result
-# }
+output "aks_node_vmss" {
+  value = data.external.aks_node_vmss.result
+}
 
-# output "aks_node_vmss_identity_object_id" {
-#   value = data.external.aks_node_vmss_identity_object_id.result
-# }
+output "aks_node_vmss_identity_object_id" {
+  value = data.external.aks_node_vmss_identity_object_id.result
+}
 
-# output "aks_node_vmss_identity_client_id" {
-#   value = data.external.aks_node_vmss_identity_client_id.result
-# }
+output "aks_node_vmss_identity_client_id" {
+  value = data.external.aks_node_vmss_identity_client_id.result
+}
+
+output "aks_identity" {
+  value = azurerm_kubernetes_cluster.example.identity[0].principal_id
+}
+
+output "aks_kubelet_identity_object_id" {
+  value = azurerm_kubernetes_cluster.example.kubelet_identity[0].object_id
+}
+
+output "aks_kubelet_identity_client_id" {
+  value = azurerm_kubernetes_cluster.example.kubelet_identity[0].client_id
+}
 
 output "configmap" {
   value = data.kubernetes_config_map.example
