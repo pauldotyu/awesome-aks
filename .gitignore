@@ -33,5 +33,6 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-*.yaml
+sample-appconfig-provider.yaml
 aks-kubeconfig
+mykubeconfig
