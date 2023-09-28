@@ -27,6 +27,7 @@ The following command will enable the features in your subscription:
 ```bash
 az feature register --namespace "Microsoft.ContainerService" --name "AzureServiceMeshPreview"
 az feature register --namespace "Microsoft.ContainerService" --name "NetworkObservabilityPreview"
+az feature register --namespace "Microsoft.ContainerService" --name "AKS-GitOps"
 ```
 
 You should also have the following Azure CLI extensions installed:
