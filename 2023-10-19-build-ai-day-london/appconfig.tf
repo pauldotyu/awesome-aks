@@ -102,107 +102,55 @@ resource "azurerm_app_configuration_key" "example_secrets_api_key" {
   ]
 }
 
-// Get the name of VMSS that is created by AKS
-// The external data source is used because the VMSS is created by AKS and Terraform does not have state information about it
-data "external" "aks_node_vmss" {
-  program = [
-    "az",
-    "resource",
-    "list",
-    "--resource-group",
-    "${azurerm_kubernetes_cluster.example.node_resource_group}",
-    "--resource-type",
-    "Microsoft.Compute/virtualMachineScaleSets",
-    "--query",
-    "[0].{id:id,name:name}"
-  ]
+resource "azurerm_user_assigned_identity" "aac" {
+  location            = var.location
+  name                = "aac-${local.name}"
+  resource_group_name = azurerm_resource_group.example.name
 }
 
-// Create a system assigned managed identity for the VMSS but wait for the Flux deployment to complete first
-// to ensure that this is one of the last things to be configured on the cluster. Otherwise, I have seen the
-// VMSS identity creation being undone and the VMSS not having a managed identity.
-resource "null_resource" "aks_node_vmss_identity_assignment" {
-  provisioner "local-exec" {
-    command = "az vmss identity assign -g ${azurerm_kubernetes_cluster.example.node_resource_group} -n ${data.external.aks_node_vmss.result.name}"
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  depends_on = [ null_resource.wait_for_flux ]
-}
-
-# // Get the object ID of the VMSS identity
-# // The external data source is used because the VMSS is created by AKS and Terraform does not have state information about it
-data "external" "aks_node_vmss_identity_object_id" {
-  program = [
-    "az",
-    "vmss",
-    "identity",
-    "show",
-    "--name",
-    "${data.external.aks_node_vmss.result.name}",
-    "--resource-group",
-    "${azurerm_kubernetes_cluster.example.node_resource_group}",
-    "--query", "{principal_id: principalId}"
-  ]
-
-  depends_on = [
-    null_resource.aks_node_vmss_identity_assignment
-  ]
+resource "azurerm_federated_identity_credential" "aac" {
+  name                = "aac-${local.name}"
+  resource_group_name = azurerm_resource_group.example.name
+  parent_id           = azurerm_user_assigned_identity.aac.id
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.example.oidc_issuer_url
+  subject             = "system:serviceaccount:azappconfig-system:az-appconfig-k8s-provider"
 }
 
 // Give the VMSS identity the ability to read from the App Configuration instance
-resource "azurerm_role_assignment" "aac_rbac_vmss" {
+resource "azurerm_role_assignment" "aac_rbac_mi" {
   scope                = azurerm_app_configuration.example.id
   role_definition_name = "App Configuration Data Reader"
-  principal_id         = data.external.aks_node_vmss_identity_object_id.result.principal_id
+  principal_id         = azurerm_user_assigned_identity.aac.principal_id
 }
 
 // Give the VMSS identity the ability to read secrets from the Key Vault instance
-resource "azurerm_role_assignment" "akv_rbac_vmss" {
+resource "azurerm_role_assignment" "akv_rbac_mi" {
   scope                = azurerm_key_vault.example.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = data.external.aks_node_vmss_identity_object_id.result.principal_id
-}
-
-// sleep for 90 seconds to allow the managed identity to be created
-resource "null_resource" "sleep" {
-  provisioner "local-exec" {
-    command = "sleep 60"
-  }
-
-  depends_on = [
-    null_resource.aks_node_vmss_identity_assignment,
-    azurerm_role_assignment.aac_rbac_vmss,
-    azurerm_role_assignment.akv_rbac_vmss
-  ]
-}
-
-data "azuread_service_principal" "aks_node_vmss_identity" {
-  object_id = data.external.aks_node_vmss_identity_object_id.result.principal_id
+  principal_id         = azurerm_user_assigned_identity.aac.principal_id
 }
 
 // Deploy the App Configuration Kubernetes provider to the AKS cluster using Helm
+// https://mcr.microsoft.com/en-us/product/azure-app-configuration/kubernetes-provider/tags
 resource "helm_release" "appconfig_provider" {
   name             = "azureappconfiguration.kubernetesprovider"
   namespace        = "azappconfig-system"
   create_namespace = true
   chart            = "oci://mcr.microsoft.com/azure-app-configuration/helmchart/kubernetes-provider"
-  version          = "1.0.0-preview"
+  version          = "1.0.0-preview4"
   cleanup_on_fail  = true
 
   depends_on = [
-    azurerm_role_assignment.aac_rbac_vmss,
-    azurerm_role_assignment.akv_rbac_vmss
+    azurerm_role_assignment.aac_rbac_mi,
+    azurerm_role_assignment.akv_rbac_mi
   ]
 }
 
 // Sleep for 60 seconds to allow the App Configuration Kubernetes provider to deploy
-resource "null_resource" "sleep_again" {
+resource "null_resource" "wait_for_helm" {
   provisioner "local-exec" {
-    command = "sleep 90"
+    command = "sleep 60"
   }
 
   depends_on = [
@@ -221,13 +169,13 @@ resource "local_file" "example_appconfig_provider_manifest" {
   filename = "sample-appconfig-provider.yaml"
   content = templatefile("sample-appconfig-provider.tpl",
     {
-      APP_CONFIG_ENDPOINT         = azurerm_app_configuration.example.endpoint,
-      NODE_VMSS_MANAGED_CLIENT_ID = data.azuread_service_principal.aks_node_vmss_identity.application_id
+      APP_CONFIG_ENDPOINT        = azurerm_app_configuration.example.endpoint,
+      MANAGED_IDENTITY_CLIENT_ID = azurerm_user_assigned_identity.aac.client_id
     }
   )
 
   depends_on = [
-    null_resource.sleep_again
+    null_resource.wait_for_helm
   ]
 }
 
@@ -239,6 +187,7 @@ resource "null_resource" "example_appconfig_provider_apply" {
 
   depends_on = [
     null_resource.wait_for_flux,
+    null_resource.wait_for_helm
   ]
 
   triggers = {

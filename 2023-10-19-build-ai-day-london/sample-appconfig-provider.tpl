@@ -12,4 +12,8 @@ spec:
       target:
         secretName: ai-service-secrets
       auth:
-        managedIdentityClientId: ${NODE_VMSS_MANAGED_CLIENT_ID}
+        workloadIdentity:
+          managedIdentityClientId: ${MANAGED_IDENTITY_CLIENT_ID}
+  auth:
+    workloadIdentity:
+      managedIdentityClientId: ${MANAGED_IDENTITY_CLIENT_ID}
