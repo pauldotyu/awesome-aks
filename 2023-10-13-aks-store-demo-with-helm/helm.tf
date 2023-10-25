@@ -2,7 +2,7 @@ resource "helm_release" "example" {
   name             = "aks-store-demo"
   repository       = "oci://ghcr.io/pauldotyu"
   chart            = "aks-store-demo-chart"
-  version          = "0.1.0"
+  version          = "1.0.0"
   namespace        = var.k8s_namespace
   create_namespace = true
   wait             = false
