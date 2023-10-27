@@ -57,7 +57,7 @@ resource "azurerm_kubernetes_cluster" "example" {
 
 resource "null_resource" "wait_for_aks" {
   provisioner "local-exec" {
-    command = "sleep 60"
+    command = "sleep 120"
   }
 
   depends_on = [azurerm_kubernetes_cluster.example]
