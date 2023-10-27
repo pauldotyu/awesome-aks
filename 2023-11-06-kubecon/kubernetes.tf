@@ -41,6 +41,11 @@ resource "azurerm_kubernetes_cluster" "example" {
     keda_enabled = true
   }
 
+  oms_agent {
+    log_analytics_workspace_id      = azurerm_log_analytics_workspace.example.id
+    msi_auth_for_monitoring_enabled = true
+  }
+
   lifecycle {
     ignore_changes = [
       monitor_metrics,
@@ -73,11 +78,7 @@ resource "azapi_update_resource" "aks_network_observability" {
   })
 
   depends_on = [
-    null_resource.wait_for_aks,
-    azurerm_monitor_data_collection_rule_association.example_dce_to_aks,
-    azurerm_monitor_data_collection_rule_association.example_dcr_to_aks,
-    azurerm_monitor_alert_prometheus_rule_group.example_node,
-    azurerm_monitor_alert_prometheus_rule_group.example_k8s,
+    null_resource.wait_for_aks
   ]
 }
 
