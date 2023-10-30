@@ -10,18 +10,18 @@ resource "azurerm_role_assignment" "example_amon_me" {
   scope                = azurerm_monitor_workspace.example.id
 }
 
-resource "azurerm_monitor_data_collection_endpoint" "example" {
-  name                = "msprom--${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
+resource "azurerm_monitor_data_collection_endpoint" "example_msprom" {
+  name                = "MSProm-${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   kind                = "Linux"
 }
 
-resource "azurerm_monitor_data_collection_rule" "example" {
-  name                        = "msprom--${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
+resource "azurerm_monitor_data_collection_rule" "example_msprom" {
+  name                        = "MSProm-${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
   resource_group_name         = azurerm_resource_group.example.name
   location                    = azurerm_resource_group.example.location
-  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.example.id
+  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.example_msprom.id
 
   data_sources {
     prometheus_forwarder {
@@ -47,13 +47,13 @@ resource "azurerm_monitor_data_collection_rule" "example" {
 resource "azurerm_monitor_data_collection_rule_association" "example_dcr_to_aks" {
   name                    = "dcr-${azurerm_kubernetes_cluster.example.name}"
   target_resource_id      = azurerm_kubernetes_cluster.example.id
-  data_collection_rule_id = azurerm_monitor_data_collection_rule.example.id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.example_msprom.id
 }
 
 # associate to a Data Collection Endpoint
 resource "azurerm_monitor_data_collection_rule_association" "example_dce_to_aks" {
   target_resource_id          = azurerm_kubernetes_cluster.example.id
-  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.example.id
+  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.example_msprom.id
 }
 
 resource "azurerm_monitor_alert_prometheus_rule_group" "example_node" {
@@ -237,4 +237,48 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example_k8s" {
     record     = "cluster:node_cpu:ratio_rate5m"
     expression = "sum(rate(node_cpu_seconds_total{job=\"node\",mode!=\"idle\",mode!=\"iowait\",mode!=\"steal\"}[5m])) by (cluster) /count(sum(node_cpu_seconds_total{job=\"node\"}) by (cluster, instance, cpu)) by (cluster)"
   }
+}
+
+# create a MSCI data collection rule
+resource "azurerm_monitor_data_collection_rule" "example_msci" {
+  name                = "MSCI-${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  kind                = "Linux"
+
+  data_sources {
+    extension {
+      name           = "ContainerInsightsExtension"
+      extension_name = "ContainerInsights"
+      streams        = ["Microsoft-ContainerInsights-Group-Default"]
+      extension_json = <<JSON
+      {
+        "dataCollectionSettings": {
+          "interval": "1m",
+          "namespaceFilteringMode": "Off",
+          "enableContainerLogV2": true
+        }
+      }
+      JSON
+    }
+  }
+
+  destinations {
+    log_analytics {
+      workspace_resource_id = azurerm_log_analytics_workspace.example.id
+      name                  = azurerm_log_analytics_workspace.example.name
+    }
+  }
+
+  data_flow {
+    streams      = ["Microsoft-ContainerInsights-Group-Default"]
+    destinations = [azurerm_log_analytics_workspace.example.name]
+  }
+}
+
+# associate to a MSCI Data Collection Rule to AKS
+resource "azurerm_monitor_data_collection_rule_association" "example_msci_to_aks" {
+  name                    = "msci-${azurerm_kubernetes_cluster.example.name}"
+  target_resource_id      = azurerm_kubernetes_cluster.example.id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.example_msci.id
 }
