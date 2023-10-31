@@ -2,7 +2,7 @@ resource "helm_release" "example" {
   name             = "aks-store-demo"
   repository       = "oci://ghcr.io/pauldotyu"
   chart            = "aks-store-demo-chart"
-  version          = "1.0.0"
+  version          = "1.1.0"
   namespace        = var.k8s_namespace
   create_namespace = true
   wait             = false
@@ -26,6 +26,4 @@ resource "helm_release" "example" {
     name  = "aiService.managedIdentityClientId"
     value = azurerm_user_assigned_identity.example.client_id
   }
-
-  depends_on = [azapi_update_resource.example]
 }

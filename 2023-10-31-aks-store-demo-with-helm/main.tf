@@ -1,23 +1,8 @@
 terraform {
   required_providers {
-    azapi = {
-      source  = "Azure/azapi"
-      version = "=1.9.0"
-    }
-
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "= 2.43.0"
-    }
-
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "=3.74.0"
-    }
-
-    external = {
-      source  = "hashicorp/external"
-      version = "=2.3.1"
     }
 
     helm = {
@@ -40,11 +25,6 @@ provider "azurerm" {
 
     cognitive_account {
       purge_soft_delete_on_destroy = true
-    }
-
-    key_vault {
-      purge_soft_delete_on_destroy    = true
-      recover_soft_deleted_key_vaults = true
     }
   }
 }

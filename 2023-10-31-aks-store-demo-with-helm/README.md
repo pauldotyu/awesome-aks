@@ -68,14 +68,20 @@ az aks get-credentials --resource-group $(terraform output -raw rg_name) --name 
 Run the following command to port forward to the store-front application:
 
 ```bash
-kubectl port-forward svc/store-front 8080:80
+kubectl port-forward -n dev svc/store-front 8080:80
 ```
 
 In another terminal, run the following command to port forward to the store-admin application:
 
 ```bash
-kubectl port-forward svc/store-admin 8081:80
+kubectl port-forward -n dev svc/store-admin 8081:80
 ```
+
+Optionally, you can patch the store-front and store-admin services to expose it using a public IP address:
+
+```bash
+kubectl patch svc store-front -n dev -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc store-admin -n dev -p '{"spec": {"type": "LoadBalancer"}}'
 
 ## Cleanup
 

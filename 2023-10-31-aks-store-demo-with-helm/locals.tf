@@ -4,6 +4,6 @@ resource "random_integer" "example" {
 }
 
 locals {
-  name     = "petstore${random_integer.example.result}"
+  name     = "pets${random_integer.example.result}"
   location = var.location
 }
