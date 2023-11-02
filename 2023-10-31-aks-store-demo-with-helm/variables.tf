@@ -1,13 +1,13 @@
 variable "location" {
   description = "value of azure region"
   type        = string
-  default     = "westeurope"
+  default     = "swedencentral"
 }
 
 variable "ai_location" {
   description = "value of azure region for deploying azure ai service"
   type        = string
-  default     = "westeurope"
+  default     = "swedencentral"
 }
 
 variable "openai_model_name" {
@@ -18,7 +18,7 @@ variable "openai_model_name" {
 variable "openai_model_version" {
   description = "value of azure openai model version"
   type        = string
-  default     = "0301"
+  default     = "0613"
 }
 
 variable "openai_model_capacity" {
