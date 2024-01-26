@@ -36,3 +36,4 @@ terraform.rc
 sample-*.yaml
 aks-kubeconfig
 mykubeconfig
+Pulumi.*.yaml
