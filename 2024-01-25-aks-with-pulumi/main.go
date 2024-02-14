@@ -135,6 +135,9 @@ func main() {
 			},
 			DnsPrefix:    pulumi.Sprintf("aks-%v", randomPet),
 			ResourceName: pulumi.Sprintf("aks-%v", randomPet),
+			AutoUpgradeProfile: &containerservice.ManagedClusterAutoUpgradeProfileArgs{
+				UpgradeChannel: pulumi.String("NodeImage"),
+			},
 		})
 		if err != nil {
 			return err
