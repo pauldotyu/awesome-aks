@@ -116,6 +116,7 @@ func main() {
 					Name:   aksNodeName,
 					VmSize: aksNodeVMSize,
 					Count:  aksNodeCount,
+					OsSKU:  pulumi.String("Ubuntu"),
 				},
 			},
 			Identity: &containerservice.ManagedClusterIdentityArgs{
@@ -163,6 +164,19 @@ func main() {
 		}); err != nil {
 			return nil
 		}
+
+		// stack outputs
+		ctx.Export("resourceGroupName", pulumi.All(resourceGroup.Name).ApplyT(
+			func(args []interface{}) string {
+				return args[0].(string)
+			},
+		))
+
+		ctx.Export("aksName", pulumi.All(managedCluster.Name).ApplyT(
+			func(args []interface{}) string {
+				return args[0].(string)
+			},
+		))
 
 		return nil
 	})
