@@ -1,0 +1,7 @@
+name: aks-pulumi-go
+runtime: go
+description: A minimal Azure Native Go Pulumi program
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: ""
