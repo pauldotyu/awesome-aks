@@ -174,8 +174,6 @@ github.com/pulumi/pulumi-azure-native-sdk/managedidentity/v2 v2.38.0 h1:bC4Nh45H
 github.com/pulumi/pulumi-azure-native-sdk/managedidentity/v2 v2.38.0/go.mod h1:8n4KFFWPk/48VB6ov98EhxhNS/zAeRkP6Tuo51Eq5pk=
 github.com/pulumi/pulumi-azure-native-sdk/monitor v1.104.0 h1:JPr9FA3yt/cu2ebTRrxc8K1jv2vtE8K20sfqhVmX6oY=
 github.com/pulumi/pulumi-azure-native-sdk/monitor v1.104.0/go.mod h1:frZ8S0zngU398oKcToAxTPoWsne9CcYlEgYUMa8m/fk=
-github.com/pulumi/pulumi-azure-native-sdk/network/v2 v2.38.0 h1:cp4routJ7jsJDDrX5Fr6pPdTySjUxgqNtqd5SxgYXdc=
-github.com/pulumi/pulumi-azure-native-sdk/network/v2 v2.38.0/go.mod h1:q9hU/ful8nYuKh6ibRngptIOz0u9a0GGPew9wv3rUto=
 github.com/pulumi/pulumi-azure-native-sdk/operationalinsights/v2 v2.27.0 h1:hLBhucCGCCexx9LXnxRS+QXPxQqp7xDCn6lvIBkSIjo=
 github.com/pulumi/pulumi-azure-native-sdk/operationalinsights/v2 v2.27.0/go.mod h1:dG6Wjp8d5V8MIxK4JgWNu4Dzcvve6flMaWlECmmshyY=
 github.com/pulumi/pulumi-azure-native-sdk/resources/v2 v2.25.0 h1:3KEIrl0B8Vba4RYnRHAmcPFHWk5cWP0IAsEIypIe19c=
@@ -267,8 +265,8 @@ golang.org/x/net v0.0.0-20220722155237-a158d28d115b/go.mod h1:XRhObCWvk6IyKnWLug
 golang.org/x/net v0.2.0/go.mod h1:KqCZLdyyvdV855qA2rE3GC2aiw5xGR5TEjj8smXukLY=
 golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
 golang.org/x/net v0.8.0/go.mod h1:QVkue5JL9kW//ek3r6jTKnTFis1tRmNAW2P1shuFdJc=
-golang.org/x/net v0.21.0 h1:AQyQV4dYCvJ7vGmJyKki9+PBdyvhkSd8EIx/qb0AYv4=
-golang.org/x/net v0.21.0/go.mod h1:bIjVDfnllIU7BJ2DNgfnXvpSvtn8VRwhlsaeUTyUS44=
+golang.org/x/net v0.23.0 h1:7EYJ93RZ9vYSZAIb2x3lnuvqO5zneoD6IvWjuhfxjTs=
+golang.org/x/net v0.23.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
