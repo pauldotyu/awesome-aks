@@ -16,7 +16,6 @@ require (
 	github.com/pulumi/pulumi-azure-native-sdk/insights/v2 v2.27.0
 	github.com/pulumi/pulumi-azure-native-sdk/managedidentity/v2 v2.38.0
 	github.com/pulumi/pulumi-azure-native-sdk/monitor v1.104.0
-	github.com/pulumi/pulumi-azure-native-sdk/network/v2 v2.38.0
 	github.com/pulumi/pulumi-azure-native-sdk/operationalinsights/v2 v2.27.0
 	github.com/pulumi/pulumi-azure-native-sdk/resources/v2 v2.25.0
 	github.com/pulumi/pulumi-azure-native-sdk/servicebus/v2 v2.38.0
@@ -97,7 +96,7 @@ require (
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
