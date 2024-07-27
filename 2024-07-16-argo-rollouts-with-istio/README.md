@@ -35,7 +35,11 @@ You should also have the following Azure CLI extensions installed:
 
 ```bash
 az extension add --name aks-preview
+az extension add --name amg
 ```
+
+> [!NOTE]
+> Make sure you are in the same directory as this README before running the commands below.
 
 ## Deploy the infrastructure with Terraform
 
@@ -54,12 +58,29 @@ export AKS_NAME=$(terraform output -raw aks_name)
 export AC_ID=$(terraform output -raw ac_id)
 export AC_ENDPOINT=$(terraform output -raw ac_endpoint)
 export OAI_IDENTITY_CLIENT_ID=$(terraform output -raw oai_identity_client_id)
+export AMG_NAME=$(terraform output -raw amg_name)
 ```
 
 Connect to the AKS cluster
 
 ```bash
 az aks get-credentials --name $AKS_NAME --resource-group $RG_NAME
+```
+
+Configure Azure Managed Prometheus to scrape metrics from any Pod across all Namespaces that have Prometheus annotations. This will enable the Istio metrics scraping.
+
+```bash
+kubectl create configmap -n kube-system ama-metrics-prometheus-config --from-file prometheus-config
+```
+
+Import the Istio dashboard into the Azure Managed Grafana instance.
+
+```bash
+az grafana dashboard import \
+  --name $AMG_NAME \
+  --resource-group $RG_NAME \
+  --folder 'Azure Managed Prometheus' \
+  --definition 7630
 ```
 
 ## AKS store demo app deployment with ArgoCD

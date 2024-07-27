@@ -17,3 +17,7 @@ output "ac_endpoint" {
 output "oai_identity_client_id" {
   value = azurerm_user_assigned_identity.oai.client_id
 }
+
+output "amg_name" {
+  value = azurerm_dashboard_grafana.example.name
+}
