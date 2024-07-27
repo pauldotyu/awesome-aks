@@ -83,6 +83,7 @@ Deploy the ArgoCD application:
 
 ```bash
 kubectl create namespace pets
+kubectl label namespace pets istio.io/rev=asm-1-21
 argocd app create pets --sync-policy auto -f https://raw.githubusercontent.com/pauldotyu/aks-store-demo/ai-tour/sample-manifests/argocd/pets.yaml
 ```
 
