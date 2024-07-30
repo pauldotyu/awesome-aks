@@ -86,6 +86,8 @@ az grafana dashboard import \
   --definition 7630
 ```
 
+> More dashboards can be found [here](https://grafana.com/orgs/istio)
+
 ## AKS store demo app deployment with ArgoCD
 
 Update the current context to the ArgoCD namespace:
@@ -141,7 +143,7 @@ kubectl apply -f - <<EOF
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway
+  name: gateway-external
   namespace: aks-istio-ingress
 spec:
   gatewayClassName: istio
@@ -164,7 +166,7 @@ metadata:
   namespace: pets
 spec:
   parentRefs:
-  - name: gateway
+  - name: gateway-external
     namespace: aks-istio-ingress
   hostnames: ["store.aks.rocks"]
   rules:
@@ -183,7 +185,7 @@ metadata:
   namespace: pets
 spec:
   parentRefs:
-  - name: gateway
+  - name: gateway-external
     namespace: aks-istio-ingress
   hostnames: ["admin.aks.rocks"]
   rules:
@@ -318,7 +320,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /  
+        value: /
     backendRefs:
     - name: ai-service-stable
       kind: Service
@@ -359,7 +361,7 @@ metadata:
   namespace: pets
 spec:
   ports:
-    - port: 80
+    - port: 5001
       targetPort: http
       name: http
   selector:
@@ -490,13 +492,13 @@ Some common issues you may run into:
 Take a look at the **PROGRAMMED** status of the Gateway:
 
 ```bash
-kubectl get gtw -n aks-istio-ingress gateway
+kubectl get gtw -n aks-istio-ingress gateway-external
 ```
 
 If the value for **PROGRAMMED** is not **True**, then take a look at the status conditions for the Gateway:
 
 ```bash
-kubectl describe gtw -n aks-istio-ingress gateway
+kubectl describe gtw -n aks-istio-ingress gateway-external
 ```
 
 If you see something like the following, then check to see if the managed ingress gateway is properly deployed.
