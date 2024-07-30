@@ -1,7 +1,8 @@
 resource "azurerm_dashboard_grafana" "example" {
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  name                = "graf-${local.random_name}"
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = azurerm_resource_group.example.location
+  name                  = "graf-${local.random_name}"
+  grafana_major_version = 10
 
   identity {
     type = "SystemAssigned"
