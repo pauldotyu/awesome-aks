@@ -34,6 +34,12 @@ variable "dalle_deployment_name" {
   default     = "dall-e-3"
 }
 
+variable "dalle_openai_api_version" {
+  description = "value of azure open ai dall-e api version"
+  type        = string
+  default     = "2024-02-15-preview"
+}
+
 variable "k8s_version" {
   description = "value of kubernetes version"
   type        = string

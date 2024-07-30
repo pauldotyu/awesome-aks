@@ -55,8 +55,11 @@ After the deployment is complete, export output variables which will be used in 
 ```bash
 export RG_NAME=$(terraform output -raw rg_name)
 export AKS_NAME=$(terraform output -raw aks_name)
-export AC_ID=$(terraform output -raw ac_id)
-export AC_ENDPOINT=$(terraform output -raw ac_endpoint)
+export OAI_GPT_ENDPOINT=$(terraform output -raw oai_gpt_endpoint)
+export OAI_GPT_DEPLOYMENT_NAME=$(terraform output -raw oai_gpt_deployment_name)
+export OAI_DALLE_ENDPOINT=$(terraform output -raw oai_dalle_endpoint)
+export OAI_DALLE_DEPLOYMENT_NAME=$(terraform output -raw oai_dalle_deployment_name)
+export OAI_DALLE_API_VERSION=$(terraform output -raw oai_dalle_api_version)
 export OAI_IDENTITY_CLIENT_ID=$(terraform output -raw oai_identity_client_id)
 export AMG_NAME=$(terraform output -raw amg_name)
 ```
@@ -211,99 +214,6 @@ Open your hosts file and add the following entry:
 
 Now you can browse to the application using the URL: [http://store.aks.rocks](http://store.aks.rocks)
 
-## Sync ai-service configs with Azure AppConfiguration Provider for Kubernetes
-
-The Azure AppConfiguration provider for Kubernetes is an extension for AKS and installed as part of the Terraform deployment. The provider allows you to use Azure App Configuration as a configuration source for your applications running in Kubernetes. It automates the process of syncing the configuration settings from Azure App Configuration to a Kubernetes ConfigMap.
-
-> [!WARNING]
-> The AKS extension will do the Helm install of the AppConfiguration provider. This includes creating a user-assigned managed identity in the Node Resource Group and a Kubernetes ServiceAccount with workload identity partially enabled. Currently, it does not create the federated credential nor does it fill in the clientId in the ServiceAccount annotation so we need to configure the remaining bits to allow the Azure AppConfiguration provider to access the Azure App Configuration store using workload identity.
-
-```bash
-# Pull the principalId from the AKS extension
-AC_IDENTITY_PRINCIPAL_ID=$(az k8s-extension show \
-  --cluster-type managedClusters \
-  --cluster-name $AKS_NAME \
-  --resource-group $RG_NAME \
-  --name appconfigurationkubernetesprovider \
-  --query aksAssignedIdentity.principalId \
-  --output tsv)
-
-# Pull the clientId from the service principal
-AC_IDENTITY_CLIENT_ID=$(az ad sp show \
-  --id $AC_IDENTITY_PRINCIPAL_ID \
-  --query appId \
-  --output tsv)
-
-# Pull the resource id from the service principal
-AC_IDENTITY_ID=$(az ad sp show \
-  --id $AC_IDENTITY_PRINCIPAL_ID \
-  --query "alternativeNames[1]" \
-  --output tsv)
-
-# Pull the user-assigned managed identity name
-AC_IDENTITY_NAME=$(az identity show \
-  --ids $AC_IDENTITY_ID \
-  --query name \
-  --output tsv)
-
-# Pull the user-assigned managed identity resource group name
-AC_IDENTITY_RG_NAME=$(az identity show \
-  --ids $AC_IDENTITY_ID \
-  --query resourceGroup \
-  --output tsv)
-
-# Pull the AKS OIDC issuer
-AKS_OIDC_ISSUER=$(az aks show \
-  --name $AKS_NAME \
-  --resource-group $RG_NAME \
-  --query oidcIssuerProfile.issuerUrl \
-  --output tsv)
-
-# Create the federated credential
-az identity federated-credential create \
-  --name azappconfig-provider \
-  --identity-name $AC_IDENTITY_NAME \
-  --resource-group $AC_IDENTITY_RG_NAME \
-  --issuer $AKS_OIDC_ISSUER \
-  --subject system:serviceaccount:azappconfig-system:az-appconfig-k8s-provider \
-  --audience api://AzureADTokenExchange
-
-# Patch the ServiceAccount with the clientId
-kubectl patch sa -n azappconfig-system az-appconfig-k8s-provider -p "{\"metadata\": {\"annotations\": {\"azure.workload.identity/client-id\": \"${AC_IDENTITY_CLIENT_ID}\"}}}"
-
-# Add a role assignment for the managed identity
-az role assignment create \
-  --role "App Configuration Data Owner" \
-  --scope $AC_ID \
-  --assignee-object-id $AC_IDENTITY_PRINCIPAL_ID \
-  --assignee-principal-type ServicePrincipal
-```
-
-Deploy the Azure AppConfiguration provider for Kubernetes:
-
-```bash
-kubectl apply -f - <<EOF
-apiVersion: azconfig.io/v1
-kind: AzureAppConfigurationProvider
-metadata:
-  name: ai-service-configs
-  namespace: pets
-spec:
-  endpoint: $AC_ENDPOINT
-  target:
-    configMapName: ai-service-configs
-  auth:
-    workloadIdentity:
-      managedIdentityClientId: $AC_IDENTITY_CLIENT_ID
-EOF
-```
-
-Check the ConfigMap to see if the configuration settings were loaded:
-
-```bash
-kubectl get configmap -n pets ai-service-configs -o yaml
-```
-
 ## Deploy ai-service using Argo Rollouts
 
 Let's deploy the ai-service using Argo Rollouts:
@@ -457,7 +367,7 @@ spec:
 EOF
 ```
 
-Create the rollout and note the canary steps. The first step sets the weight to 50% for the canary service. The second step pauses the rollout. The third step sets the weight to 100% for the canary service. The fourth step pauses the rollout and waits for a final promotion.
+Create a ServiceAccount for the ai-service
 
 ```bash
 kubectl apply -f - <<EOF
@@ -468,75 +378,50 @@ metadata:
     azure.workload.identity/client-id: $OAI_IDENTITY_CLIENT_ID
   name: ai-service-account
   namespace: pets
----
+EOF
+```
+
+Create a ConfigMap for the ai-service
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-service-configs
+  namespace: pets
+data:
+  USE_AZURE_OPENAI: "True"  
+  USE_AZURE_AD: "True"
+  AZURE_OPENAI_ENDPOINT: $OAI_GPT_ENDPOINT
+  AZURE_OPENAI_DEPLOYMENT_NAME: $OAI_GPT_DEPLOYMENT_NAME
+  AZURE_OPENAI_DALLE_ENDPOINT: $OAI_DALLE_ENDPOINT
+  AZURE_OPENAI_DALLE_DEPLOYMENT_NAME: $OAI_DALLE_DEPLOYMENT_NAME
+  AZURE_OPENAI_API_VERSION: $OAI_DALLE_API_VERSION
+EOF
+```
+
+Create the rollout for the ai-service. The actual manifest is [here](https://github.com/pauldotyu/aks-store-demo-manifests/blob/argo-rollout/ai-service/base/ai-service.yaml). Note the canary steps in the manifest. The first step sets the weight to 50% for the canary service. The second step pauses the rollout. The third step sets the weight to 100% for the canary service. The fourth step pauses the rollout and waits for a final promotion.
+
+```bash
+kubectl apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
-kind: Rollout
+kind: Application
 metadata:
   name: ai-service
-  namespace: pets
 spec:
-  replicas: 10
-  strategy:
-    canary:
-      canaryService: ai-service-canary
-      stableService: ai-service-stable
-      trafficRouting:
-        plugins:
-          argoproj-labs/gatewayAPI:
-            httpRoute: ai-service
-            namespace: pets
-      steps:
-      - setWeight: 50
-      - pause: {}
-      - setWeight: 100
-      - pause: {}
-  revisionHistoryLimit: 2
-  selector:
-    matchLabels:
-      app: ai-service
-  template:
-    metadata:
-      labels:
-        app: ai-service
-        azure.workload.identity/use: "true"
-    spec:
-      serviceAccountName: ai-service-account
-      containers:
-        - name: ai-service
-          image: ghcr.io/pauldotyu/aks-store-demo/ai-service:1.2.0
-          ports:
-            - containerPort: 5001
-          envFrom:
-            - configMapRef:
-                name: ai-service-configs
-          resources:
-            requests:
-              cpu: 20m
-              memory: 50Mi
-            limits:
-              cpu: 50m
-              memory: 128Mi
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 60
-            failureThreshold: 3
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 3
-            failureThreshold: 10
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 3
-            failureThreshold: 10
-            periodSeconds: 10
+  destination:
+    namespace: pets
+    server: https://kubernetes.default.svc
+  source:
+    path: ai-service/overlays/dev
+    repoURL: https://github.com/pauldotyu/aks-store-demo-manifests.git
+    targetRevision: argo-rollout
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
 EOF
 ```
 
@@ -546,10 +431,10 @@ Watch the rollout and wait for **Status** to show **✔ Healthy**.
 kubectl argo rollouts get rollout ai-service -n pets -w
 ```
 
-When the rollout is healthy, hit **CTRL+C** to exit the watch then patch the rollout to change the **ai-service** image to the **1.4.0** version.
-  
+When the rollout is healthy, hit **CTRL+C** to exit the watch then update the rollout to set the **ai-service** image to the **1.4.0** version.
+
 ```bash
-kubectl edit rollout ai-service -n pets
+kubectl argo rollouts set image ai-service -n pets ai-service=ghcr.io/pauldotyu/aks-store-demo/ai-service:1.4.0
 ```
 
 Watch the rollout again and wait for **Status** to show **॥ Paused**.

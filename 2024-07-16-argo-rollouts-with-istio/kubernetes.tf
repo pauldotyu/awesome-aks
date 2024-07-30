@@ -73,9 +73,6 @@ resource "azapi_update_resource" "aks_preview_features" {
 
   body = {
     properties = {
-      aiToolchainOperatorProfile = {
-        enabled = true
-      }
       networkProfile = {
         advancedNetworking = {
           observability = {
@@ -85,38 +82,4 @@ resource "azapi_update_resource" "aks_preview_features" {
       }
     }
   }
-}
-
-resource "azurerm_kubernetes_cluster_extension" "appconfig" {
-  cluster_id     = azurerm_kubernetes_cluster.example.id
-  name           = "appconfigurationkubernetesprovider"
-  extension_type = "Microsoft.AppConfiguration"
-  release_train  = "preview"
-
-  depends_on = [
-    azapi_update_resource.aks_preview_features
-  ]
-}
-
-data "azurerm_user_assigned_identity" "aks_kaito_addon" {
-  resource_group_name = azurerm_kubernetes_cluster.example.node_resource_group
-  name                = "ai-toolchain-operator-${azurerm_kubernetes_cluster.example.name}"
-  depends_on = [
-    azapi_update_resource.aks_preview_features
-  ]
-}
-
-resource "azurerm_role_assignment" "aks_kaito_addon" {
-  scope                = azurerm_kubernetes_cluster.example.id
-  role_definition_name = "Contributor"
-  principal_id         = data.azurerm_user_assigned_identity.aks_kaito_addon.principal_id
-}
-
-resource "azurerm_federated_identity_credential" "aks_kaito_addon" {
-  resource_group_name = azurerm_kubernetes_cluster.example.node_resource_group
-  parent_id           = data.azurerm_user_assigned_identity.aks_kaito_addon.id
-  name                = "kaito-federated-identity"
-  issuer              = azurerm_kubernetes_cluster.example.oidc_issuer_url
-  subject             = "system:serviceaccount:kube-system:kaito-gpu-provisioner"
-  audience            = ["api://AzureADTokenExchange"]
 }

@@ -6,12 +6,24 @@ output "aks_name" {
   value = azurerm_kubernetes_cluster.example.name
 }
 
-output "ac_id" {
-  value = azurerm_app_configuration.example.id
+output "oai_gpt_endpoint" {
+  value = azurerm_cognitive_account.example.endpoint
 }
 
-output "ac_endpoint" {
-  value = azurerm_app_configuration.example.endpoint
+output "oai_gpt_deployment_name" {
+  value = var.gpt4_deployment_name
+}
+
+output "oai_dalle_endpoint" {
+  value = azurerm_cognitive_account.example.endpoint
+}
+
+output "oai_dalle_deployment_name" {
+  value = var.dalle_deployment_name
+}
+
+output "oai_dalle_api_version" {
+  value = var.dalle_openai_api_version
 }
 
 output "oai_identity_client_id" {
