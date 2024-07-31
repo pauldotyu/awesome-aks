@@ -8,6 +8,11 @@ resource "azurerm_kubernetes_cluster" "example" {
   node_os_channel_upgrade   = "SecurityPatch"
   kubernetes_version        = var.k8s_version
 
+  azure_active_directory_role_based_access_control {
+    managed            = true
+    azure_rbac_enabled = true
+  }
+
   default_node_pool {
     name                 = "default"
     vm_size              = "Standard_D2s_v4"
@@ -65,6 +70,12 @@ resource "azurerm_kubernetes_cluster" "example" {
       microsoft_defender,
     ]
   }
+}
+
+resource "azurerm_role_assignment" "aks_cluster_admin" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  scope                = azurerm_kubernetes_cluster.example.id
 }
 
 resource "azapi_update_resource" "aks_preview_features" {
