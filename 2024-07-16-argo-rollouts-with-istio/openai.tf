@@ -8,15 +8,14 @@ resource "azurerm_cognitive_account" "example" {
   local_auth_enabled    = false
 }
 
-resource "azurerm_cognitive_deployment" "gpt4" {
-  count                = var.deploy_gpt4 ? 1 : 0
+resource "azurerm_cognitive_deployment" "gpt" {
   cognitive_account_id = azurerm_cognitive_account.example.id
-  name                 = var.gpt4_deployment_name
+  name                 = var.gpt_model_name
 
   model {
-    name    = "gpt-4o"
     format  = "OpenAI"
-    version = "2024-05-13"
+    name    = var.gpt_model_name
+    version = var.gpt_model_version
   }
 
   scale {
@@ -25,14 +24,13 @@ resource "azurerm_cognitive_deployment" "gpt4" {
 }
 
 resource "azurerm_cognitive_deployment" "dalle" {
-  count                = var.deploy_dalle ? 1 : 0
   cognitive_account_id = azurerm_cognitive_account.example.id
-  name                 = var.dalle_deployment_name
+  name                 = var.dalle_model_name
 
   model {
-    name    = "dall-e-3"
     format  = "OpenAI"
-    version = "3.0"
+    name    = var.dalle_model_name
+    version = var.dalle_model_version
   }
 
   scale {
@@ -49,10 +47,10 @@ resource "azurerm_user_assigned_identity" "oai" {
 resource "azurerm_federated_identity_credential" "oai" {
   resource_group_name = azurerm_resource_group.example.name
   parent_id           = azurerm_user_assigned_identity.oai.id
-  name                = "oai-${local.random_name}"
+  name                = "${azurerm_cognitive_account.example.name}-k8s"
   issuer              = azurerm_kubernetes_cluster.example.oidc_issuer_url
   audience            = ["api://AzureADTokenExchange"]
-  subject             = "system:serviceaccount:${var.k8s_namespace}:ai-service-account"
+  subject             = "system:serviceaccount:pets:ai-service-account"
 }
 
 resource "azurerm_role_assignment" "oai_rbac_mi" {
@@ -66,4 +64,3 @@ resource "azurerm_role_assignment" "oai_rbac_me" {
   role_definition_name = "Cognitive Services OpenAI User"
   principal_id         = data.azurerm_client_config.current.object_id
 }
-

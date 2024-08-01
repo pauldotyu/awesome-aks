@@ -17,8 +17,8 @@ resource "azurerm_kubernetes_cluster" "example" {
     name                 = "default"
     vm_size              = "Standard_D2s_v4"
     enable_auto_scaling  = true
-    max_count            = 10
-    min_count            = 4
+    max_count            = 12
+    min_count            = 6
     orchestrator_version = var.k8s_version
 
     upgrade_settings {
