@@ -335,10 +335,16 @@ Connect to the ArgoCD server.
 argocd login --core
 ```
 
-Deploy the ArgoCD application.
+Using the ArgoCD CLI, deploy the demo application.
 
 ```bash
-argocd app create pets --sync-policy auto --repo https://github.com/pauldotyu/aks-store-demo-manifests.git --revision ai-tour --path overlays/dev --dest-namespace pets --dest-server https://kubernetes.default.svc
+argocd app create pets \
+--sync-policy auto \
+--repo https://github.com/pauldotyu/aks-store-demo-manifests.git \
+--revision argo \
+--path overlays/dev \
+--dest-namespace pets \
+--dest-server https://kubernetes.default.svc
 ```
 
 Check the status of the application and wait for the **STATUS** to be **Synced** and **HEALTH** to be **Healthy**.
@@ -347,11 +353,13 @@ Check the status of the application and wait for the **STATUS** to be **Synced**
 argocd app list
 ```
 
-Optionally, you can use the ArgoCD Release Server UI to watch the application deployment.
+> [!NOTE]
+> Optionally, you can use the ArgoCD Release Server UI to watch the application deployment.
 
-Run the following command then click on the link below to open the ArgoCD UI.
+Open another terminal tab and run the following command then click on the link below to open the ArgoCD UI. This will need to be kept open for as long as you want to use the UI. Get the password for the ArgoCD UI by running the command below then use that to login to the UI. The username is `admin`.
 
 ```bash
+argocd admin initial-password
 argocd admin dashboard
 ```
 
@@ -380,8 +388,14 @@ Merge the branch to deploy the rollout for the ai-service. The actual manifest i
 > Make sure you are in the aks-store-demo-manifests repository before running the command below.
 
 ```bash
-git merge ai-tour-1
-git diff origin/ai-tour
+git merge argo-add-ai
+```
+
+Open the `base/ai-service.yaml` file and see the new resources that were added. The rollout will use the Gateway API to manage the traffic split between the stable and canary services.
+
+Commit the changes and push to the remote.
+
+```bash
 git push
 ```
 
@@ -397,12 +411,14 @@ When the app is fully synced, watch the rollout and wait for **Status** to show 
 kubectl argo rollouts get rollout ai-service -n pets -w
 ```
 
-Using a web browser, navigate to the 
+When the rollout is healthy, hit **CTRL+C** to exit the watch.
 
-When the rollout is healthy, hit **CTRL+C** to exit the watch then update the rollout to set the **ai-service** image to the **1.4.0** version.
+Using a web browser, navigate to the store admin site and create a new product. You should see the AI service being used to generate the product description.
+
+Next, let's update the rollout to set the **ai-service** image to the **latest** version.
 
 ```bash
-kubectl argo rollouts set image ai-service -n pets ai-service=ghcr.io/pauldotyu/aks-store-demo/ai-service:1.4.0
+kubectl argo rollouts set image ai-service -n pets ai-service=ghcr.io/pauldotyu/aks-store-demo/ai-service:latest
 ```
 
 Watch the rollout again and wait for **Status** to show **॥ Paused**.
@@ -441,7 +457,7 @@ All that is left is to promote the canary to the stable version.
 kubectl argo rollouts promote ai-service -n pets
 ```
 
-Watch the rollout one last time to see the stable version is now running version 1.4.0 and after a few minutes the rollout will scale down the **revision:1** ReplicaSet pods.
+Watch the rollout one last time to see the stable version is now running the latest version and after a few minutes the rollout will scale down the **revision:1** ReplicaSet pods.
 
 ```bash
 kubectl argo rollouts get rollout ai-service -n pets -w
@@ -449,7 +465,9 @@ kubectl argo rollouts get rollout ai-service -n pets -w
 
 When you see the **Status** show **✔ Healthy** and **revision:1** ReplicaSet status as **ScaledDown**, hit **CTRL+C** to exit the watch.
 
-## Import Istio dashboard into Azure Managed Grafana
+Go back to the store admin site and create a new product. You should see the AI service being used to generate the product images too!
+
+## BONUS: Import Istio dashboard into Azure Managed Grafana
 
 Import the Istio dashboard into the Azure Managed Grafana instance.
 
@@ -460,6 +478,8 @@ az grafana dashboard import \
   --folder 'Azure Managed Prometheus' \
   --definition 7630
 ```
+
+Navigate to your Azure Managed Grafana in the Azure portal, click on the endpoint link, then log in. In the Grafana portal, click **Dashboards** in the left navigation, then click the **Azure Managed Prometheus** folder. You should see the Istio dashboard along with other Kubernetes dashboards. Click on a few and explore the metrics.
 
 ## Troubleshooting
 
@@ -522,6 +542,16 @@ Run the following command to destroy the infrastructure.
 
 ```bash
 terraform destroy
+```
+
+Also do a git reset in the aks-store-demo-manifests repository so that you can start fresh next time.
+
+```bash
+# reset to clean state
+git reset --hard dd449aa
+
+# force push to the remote
+git push --force
 ```
 
 ## Feedback
