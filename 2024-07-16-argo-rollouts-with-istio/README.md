@@ -27,7 +27,6 @@ Before running the `terraform apply` command, be sure you have Azure CLI install
 The following command will enable the features in your subscription:
 
 ```bash
-az feature register --namespace "Microsoft.ContainerService" --name "AzureServiceMeshPreview"
 az feature register --namespace "Microsoft.ContainerService" --name "AdvancedNetworkingPreview"
 az feature register --namespace "Microsoft.ContainerService" --name "CiliumDataplanePreview"
 ```
