@@ -358,7 +358,6 @@ argocd app list
 Open another terminal tab and run the following command then click on the link below to open the ArgoCD UI. This will need to be kept open for as long as you want to use the UI. Get the password for the ArgoCD UI by running the command below then use that to login to the UI. The username is `admin`.
 
 ```bash
-argocd admin initial-password
 argocd admin dashboard
 ```
 
@@ -387,7 +386,7 @@ Merge the branch to deploy the rollout for the ai-service. The actual manifest i
 > Make sure you are in the aks-store-demo-manifests repository before running the command below.
 
 ```bash
-git merge argo-add-ai
+git merge argo-add-ai-rollout
 ```
 
 Open the `base/ai-service.yaml` file and see the new resources that were added. The rollout will use the Gateway API to manage the traffic split between the stable and canary services.
@@ -401,7 +400,7 @@ git push
 Force an ArgoCD sync to deploy the ai-service rollout.
 
 ```bash
-argocd app sync pets --force
+argocd app sync pets --force --prune
 ```
 
 When the app is fully synced, watch the rollout and wait for **Status** to show **✔ Healthy**.
@@ -411,6 +410,12 @@ kubectl argo rollouts get rollout ai-service -n pets -w
 ```
 
 When the rollout is healthy, hit **CTRL+C** to exit the watch.
+
+You should see that it has been updated to 100/0 traffic split between the stable and canary with the stable service receiving all traffic.
+
+```bash
+kubectl describe httproute ai-service -n pets
+```
 
 Using a web browser, navigate to the store admin site and create a new product. You should see the AI service being used to generate the product description.
 
@@ -444,7 +449,9 @@ Watch the rollout and wait for **Status** to show **॥ Paused**.
 kubectl argo rollouts get rollout ai-service -n pets -w
 ```
 
-When the rollout is paused, hit **CTRL+C** to exit the watch then check the weights of the HTTPRoute again. You should see that it has been updated to 0/100 traffic split with the canary service receiving all traffic.
+When the rollout is paused, hit **CTRL+C** to exit the watch then check the weights of the HTTPRoute again.
+
+You should see that it has been updated to 0/100 traffic split with the canary service receiving all traffic.
 
 ```bash
 kubectl describe httproute ai-service -n pets
