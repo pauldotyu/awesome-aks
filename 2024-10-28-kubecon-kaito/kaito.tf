@@ -53,10 +53,17 @@ resource "helm_release" "kaito_workspace" {
   create_namespace = true
 }
 
+resource "kubernetes_namespace" "example" {
+  metadata {
+    name = "pets"
+  }
+}
+
 # Create a secret to store the Azure Container Registry credentials for the workspace to refer to when pushing and pulling images from the registry
 resource "kubernetes_secret" "example" {
   metadata {
-    name = "myregistrysecret"
+    name      = "myregistrysecret"
+    namespace = kubernetes_namespace.example.metadata[0].name
   }
 
   type = "kubernetes.io/dockerconfigjson"
@@ -72,35 +79,4 @@ resource "kubernetes_secret" "example" {
       }
     })
   }
-}
-
-resource "kubernetes_namespace" "example" {
-  metadata {
-    name = "pets"
-  }
-}
-
-resource "kubernetes_manifest" "phi_3_mini_workspace" {
-  manifest = {
-    "apiVersion" = "kaito.sh/v1alpha1"
-    "inference" = {
-      "preset" = {
-        "name" = "phi-3-mini-128k-instruct"
-      }
-    }
-    "kind" = "Workspace"
-    "metadata" = {
-      "name"      = "workspace-phi-3-mini"
-      "namespace" = "pets"
-    }
-    "resource" = {
-      "instanceType" = "Standard_NC6s_v3"
-      "labelSelector" = {
-        "matchLabels" = {
-          "apps" = "phi-3"
-        }
-      }
-    }
-  }
-  depends_on = [kubernetes_namespace.example]
 }
