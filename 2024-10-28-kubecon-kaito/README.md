@@ -4,44 +4,31 @@ Work in progress...
 
 Spin up the Azure resources then run the following commands:
 
+```bash
+export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+terraform apply
+```
+
+Connect to the AKS cluster.
+
+```bash
+az aks get-credentials -g $(terraform output -raw rg_name) -n $(terraform output -raw aks_name)
+```
+
 Deploy the ArgoCD application which deploys the AKS Store Demo app.
 
 ```bash
-kubectl apply -n argocd -f ~/repos/pauldotyu/aks-store-demo/sample-manifests/argocd/pets.yaml
-```
-
-Update the default namespace to use the `argocd` namespace.
-
-```bash
-kubectl config set-context --current --namespace=argocd
-```
-
-Force a sync of the ArgoCD application.
-
-```bash
-argocd app sync pets --force
+kubectl apply -n argocd -f https://raw.githubusercontent.com/pauldotyu/aks-store-demo/refs/heads/bigbertha/sample-manifests/argocd/pets.yaml
 ```
 
 Get the initial password for the ArgoCD admin user.
 
 ```bash
-argocd admin initial-password
+kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
 ```
 
 Port forward the ArgoCD server and login to the UI with username `admin` and the password from the previous step.
 
 ```bash
-kubectl port-forward svc/argocd-release-server 8080:443
-```
-
-Set the default namespace back to `default`.
-
-```bash
-kubectl config set-context --current --namespace=default
-```
-
-After you're done testing, delete the ArgoCD application.
-
-```bash
-argocd app delete argocd/pets
+kubectl port-forward -n argocd svc/argocd-release-server 8080:443
 ```
