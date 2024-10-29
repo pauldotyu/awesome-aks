@@ -7,9 +7,10 @@ resource "azurerm_kubernetes_cluster" "example" {
   workload_identity_enabled = true
 
   default_node_pool {
-    name       = "default"
-    node_count = 3
-    vm_size    = "Standard_D2_v2"
+    name                        = "default"
+    temporary_name_for_rotation = "temp"
+    node_count                  = 3
+    vm_size                     = "Standard_D2s_v4"
 
     upgrade_settings {
       drain_timeout_in_minutes      = 0

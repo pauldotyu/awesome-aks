@@ -73,3 +73,34 @@ resource "kubernetes_secret" "example" {
     })
   }
 }
+
+resource "kubernetes_namespace" "example" {
+  metadata {
+    name = "pets"
+  }
+}
+
+resource "kubernetes_manifest" "phi_3_mini_workspace" {
+  manifest = {
+    "apiVersion" = "kaito.sh/v1alpha1"
+    "inference" = {
+      "preset" = {
+        "name" = "phi-3-mini-128k-instruct"
+      }
+    }
+    "kind" = "Workspace"
+    "metadata" = {
+      "name"      = "workspace-phi-3-mini"
+      "namespace" = "pets"
+    }
+    "resource" = {
+      "instanceType" = "Standard_NC6s_v3"
+      "labelSelector" = {
+        "matchLabels" = {
+          "apps" = "phi-3"
+        }
+      }
+    }
+  }
+  depends_on = [kubernetes_namespace.example]
+}
