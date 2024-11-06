@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: tuning-pipeline
+  namespace: ${NAMESPACE}
+spec:
+  entrypoint: tuning-pipeline
+  ttlStrategy:
+    secondsAfterCompletion: 43200 # Set TTL to 12 hours (12 hours * 3600 seconds/hour)
+  templates:
+    - name: tuning-pipeline
+      dag:
+        tasks:
+          - name: tune-model
+            template: model-tuning
+    - name: model-tuning
+      container:
+        image: busybox
+        command: ["echo", "Step A: Model Fine-Tuning"]

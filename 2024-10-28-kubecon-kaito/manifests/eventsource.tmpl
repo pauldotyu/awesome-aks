@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: tuning-webhook
+  namespace: ${NAMESPACE}
+spec:
+  azureEventsHub:
+    tuning-trigger:
+      fqdn: ${EVENTHUB_FQDN}
+      sharedAccessKeyName:
+        name: myeventhubsecret
+        key: sharedAccessKeyName
+      sharedAccessKey:
+        name: myeventhubsecret
+        key: sharedAccessKey
+      hubName: ${EVENTHUB_NAME}

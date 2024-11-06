@@ -60,7 +60,7 @@ resource "kubernetes_namespace" "example" {
 }
 
 # Create a secret to store the Azure Container Registry credentials for the workspace to refer to when pushing and pulling images from the registry
-resource "kubernetes_secret" "example" {
+resource "kubernetes_secret" "registry" {
   metadata {
     name      = "myregistrysecret"
     namespace = kubernetes_namespace.example.metadata[0].name
@@ -78,5 +78,20 @@ resource "kubernetes_secret" "example" {
         }
       }
     })
+  }
+}
+
+# Create a secret to store azure event hub shared access key
+resource "kubernetes_secret" "eventhub" {
+  metadata {
+    name      = "myeventhubsecret"
+    namespace = kubernetes_namespace.example.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    "sharedAccessKeyName" = "RootManageSharedAccessKey"
+    "sharedAccessKey"     = azurerm_eventhub_namespace.example.default_primary_key
   }
 }
