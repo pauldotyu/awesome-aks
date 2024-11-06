@@ -1,12 +1,3 @@
-resource "local_file" "servicemonitor" {
-  filename = "manifests/servicemonitor.yaml"
-  content = templatefile("manifests/servicemonitor.tmpl",
-    {
-      NAMESPACE = kubernetes_namespace.example.metadata[0].name
-    }
-  )
-}
-
 resource "local_file" "eventbus" {
   filename = "manifests/eventbus.yaml"
   content = templatefile("manifests/eventbus.tmpl",
