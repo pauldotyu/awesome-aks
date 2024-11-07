@@ -41,6 +41,12 @@ Pulumi stores deployment state within stacks. This helps you manage different de
 pulumi stack init dev
 ```
 
+Export the `PULUMI_CONFIG_PASSPHRASE` so you are not prompted for it when running the `pulumi up` command:
+
+```bash
+export PULUMI_CONFIG_PASSPHRASE=""
+```
+
 Before running the `pulumi up` command, be sure to configure the location for the resources using the following command:
 
 ```bash
