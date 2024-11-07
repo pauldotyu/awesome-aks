@@ -81,11 +81,10 @@ Open a new terminal and test the product-service metrics endpoint.
 curl http://localhost:3002/metrics
 ```
 
-Add 100 new products through the import endpoint.
+Gradually import the test data.
 
 ```bash
-# make sure you are in the same directory as the testImport.json file
-curl -X POST http://localhost:3002/import -H "Content-Type: application/json" --data-binary @testImport.json
+for i in {1..10}; do curl -X POST http://localhost:3002/import -H "Content-Type: application/json" --data-binary @testImport$i.json; echo "Processed testImport$i.json"; sleep 15; done
 ```
 
 ## Cleanup

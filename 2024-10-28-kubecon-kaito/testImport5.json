@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Marine Mammal Plush Set",
+    "price": 14.99,
+    "description": "Set of plush toys including a whale, dolphin, and seal.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lagoon Lounge Bed",
+    "price": 39.99,
+    "description": "Comfortable pet bed resembling a tranquil lagoon.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seaside Snuggle Blanket",
+    "price": 19.99,
+    "description": "Soft blanket with seaside patterns for cozy naps.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Barnacle Ball Treat Toy",
+    "price": 12.99,
+    "description": "Fill with treats to keep your pet engaged and mentally stimulated.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Saltwater Taffy Chews",
+    "price": 6.99,
+    "description": "Chew treats that taste like the seaside favorite, minus the sugar.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seaglass Chew Toy",
+    "price": 8.49,
+    "description": "Smooth, durable chew toy mimicking ocean-tumbled glass.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sandy Paws Grooming Mitt",
+    "price": 11.99,
+    "description": "Grooming mitt that removes loose hair while petting your furry friend.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Whale Water Sprinkler Toy",
+    "price": 13.99,
+    "description": "Connects to a hose for splashing fun during hot days.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Coral Crunch Dental Stick",
+    "price": 7.99,
+    "description": "Chew stick that promotes dental health with a coral design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Message in a Bottle Toy",
+    "price": 9.49,
+    "description": "Hide treats inside for a rewarding playtime experience.",
+    "image": "/placeholder.jpg"
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Anchor Rope Leash",
+    "price": 15.99,
+    "description": "Secure your walks with the durable Anchor Rope Leash.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Fish Basket Hideaway",
+    "price": 22.99,
+    "description": "A cozy hideaway shaped like a fish basket for your feline friend.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Star Plush Toy",
+    "price": 6.49,
+    "description": "Soft and cuddly, the Sea Star Plush Toy is perfect for snuggles.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ocean Breeze Catnip",
+    "price": 3.99,
+    "description": "Organic catnip to delight your cat, with a hint of ocean breeze scent.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shell Shocked Chew Bone",
+    "price": 9.99,
+    "description": "A long-lasting chew bone shaped like a seashell for teething puppies.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Frisbee",
+    "price": 7.99,
+    "description": "Navigate fun with the Compass Frisbee, perfect for high-flying fetch games.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Mariner's Mouse Trio",
+    "price": 5.99,
+    "description": "Set of three plush mice toys dressed as mariners for endless cat fun.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Fishing Rod Teaser",
+    "price": 8.99,
+    "description": "Interactive play with the Fishing Rod Teaser, featuring a dangling fish toy.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Life Ring Chew Toy",
+    "price": 6.99,
+    "description": "A ring-shaped chew toy ideal for teething puppies and active chewers.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Hideout Cat Condo",
+    "price": 49.99,
+    "description": "A multi-level cat condo designed to look like a harbor, with plenty of spots to lounge.",
+    "image": "/placeholder.jpg"
+  }
+]

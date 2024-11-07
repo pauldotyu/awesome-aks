@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Buoy Buddy Floating Toy",
+    "price": 9.99,
+    "description": "Floating toy perfect for fetch in pools or lakes.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ocean Mist Grooming Spray",
+    "price": 8.49,
+    "description": "Leave-in conditioning spray with an ocean scent.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Turtle Slow Feeder",
+    "price": 14.99,
+    "description": "Slow feeder bowl designed to look like a sea turtle.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Buccaneer's Booty Treats",
+    "price": 7.99,
+    "description": "Delicious treats that your pet will treasure.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Marine Rope Collar",
+    "price": 13.49,
+    "description": "Durable collar made from marine-grade rope.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Treasure Map Chew Toy",
+    "price": 9.49,
+    "description": "Chew toy with a printed treasure map design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Nautical Nightlight",
+    "price": 16.99,
+    "description": "A soothing nightlight for pets with a nautical theme.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Mermaid's Morsels Cat Treats",
+    "price": 4.99,
+    "description": "Tasty fish treats that even a mermaid's cat would love.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ship Wheel Scratcher",
+    "price": 25.99,
+    "description": "Cat scratcher designed like a ship's wheel.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Breeze Cooling Mat",
+    "price": 27.99,
+    "description": "Self-cooling mat to keep your pet comfortable on hot days.",
+    "image": "/placeholder.jpg"
+  }
+]

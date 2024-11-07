@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Neptune's Nibbles",
+    "price": 7.49,
+    "description": "Fish-shaped treats packed with omega-3 fatty acids.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sunken Treasure Toy Box",
+    "price": 27.99,
+    "description": "A toy storage box that looks like a treasure chest.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sand Dollar Chew Disc",
+    "price": 6.49,
+    "description": "Durable chew disc perfect for fetch and chew sessions.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Wave Rider Frisbee",
+    "price": 8.99,
+    "description": "Aerodynamic frisbee designed for long-distance throws.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Coral Cove Hideout",
+    "price": 21.99,
+    "description": "A cozy hideout for small pets shaped like a coral cove.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pirate's Map Bedding",
+    "price": 18.99,
+    "description": "Comfortable bedding with a fun pirate map design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Deep Sea Dental Rope",
+    "price": 7.99,
+    "description": "Rope toy that cleans teeth while your dog plays.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Tug Boat Toy",
+    "price": 10.99,
+    "description": "Floating tug boat toy great for water fetch games.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Submarine Squeak Toy",
+    "price": 9.49,
+    "description": "Squeaky toy shaped like a submarine for underwater fun.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lagoon Treat Dispenser",
+    "price": 12.99,
+    "description": "Challenge your pet with this lagoon-themed treat dispenser.",
+    "image": "/placeholder.jpg"
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Pirate's Parrot Plush",
+    "price": 7.49,
+    "description": "Colorful parrot plush toy with a hidden squeaker.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Beach Buddy Cooling Bandana",
+    "price": 6.99,
+    "description": "Keep your pet cool with this water-activated cooling bandana.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Whirlpool Water Bowl",
+    "price": 22.99,
+    "description": "Circulating water bowl to encourage hydration.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Chew Compass",
+    "price": 5.99,
+    "description": "Durable chew toy shaped like a compass.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Captain's Cutlass Tug Toy",
+    "price": 8.49,
+    "description": "Tug toy shaped like a pirate's cutlass for adventurous play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Serpent Plush Toy",
+    "price": 12.49,
+    "description": "Extra-long plush toy for dogs who love to thrash and tug.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Hound Dog Jacket",
+    "price": 24.99,
+    "description": "Stylish jacket to keep your dog warm on breezy days.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Gill's Fish Bone Chew",
+    "price": 6.49,
+    "description": "Natural chew shaped like a fish bone.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sunset Beach Collar",
+    "price": 11.99,
+    "description": "Brightly colored collar inspired by beach sunsets.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Voyager's Vest Harness",
+    "price": 19.99,
+    "description": "Comfortable vest harness for daily walks.",
+    "image": "/placeholder.jpg"
+  }
+]

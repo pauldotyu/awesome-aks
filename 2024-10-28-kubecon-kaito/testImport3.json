@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Sandy Shores Play Mat",
+    "price": 24.99,
+    "description": "Comfortable play mat with seaside designs for pets to relax on.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Bubble Blower Dog Toy",
+    "price": 13.99,
+    "description": "Automatic bubble blower that releases bacon-scented bubbles for dogs.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seaweed Crunch Treats",
+    "price": 4.99,
+    "description": "Healthy treats made with real seaweed for a tasty snack.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Captain's Log Chew Stick",
+    "price": 7.49,
+    "description": "Natural chew stick resembling a captain's log for gnawing pleasure.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lighthouse Laser Pointer",
+    "price": 9.99,
+    "description": "Keep your cat active with the Lighthouse Laser Pointer.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Minnow Tug Toy",
+    "price": 5.99,
+    "description": "A small but durable tug toy shaped like a minnow.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Barnacle Bite Toy",
+    "price": 6.49,
+    "description": "Textured chew toy that helps clean teeth during play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Nautical Knot Chew Rope",
+    "price": 8.99,
+    "description": "Sturdy chew rope with nautical knots for aggressive chewers.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Reef Explorer Snuffle Mat",
+    "price": 19.99,
+    "description": "Interactive feeding mat that stimulates your pet's foraging instincts.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Captain's Hat Costume",
+    "price": 9.99,
+    "description": "Dress your pet as the captain with this adorable hat.",
+    "image": "/placeholder.jpg"
+  }
+]

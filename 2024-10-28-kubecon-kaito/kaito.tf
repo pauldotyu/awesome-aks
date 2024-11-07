@@ -79,6 +79,8 @@ resource "kubernetes_secret" "registry" {
       }
     })
   }
+
+  depends_on = [azurerm_container_registry_token_password.example]
 }
 
 # Create a secret to store azure event hub shared access key

@@ -15,9 +15,9 @@ resource "azurerm_eventhub" "example" {
 }
 
 resource "azurerm_monitor_action_group" "email" {
-  name                = "ProductCounterActionGroupEmail"
+  name                = "myemailactiongroup"
   resource_group_name = azurerm_resource_group.example.name
-  short_name          = "product"
+  short_name          = "email"
 
   email_receiver {
     name          = "sendtoadmin"
@@ -26,9 +26,9 @@ resource "azurerm_monitor_action_group" "email" {
 }
 
 resource "azurerm_monitor_action_group" "eventhub" {
-  name                = "ProductCounterActionGroupEventHub"
+  name                = "myeventhubactiongroup"
   resource_group_name = azurerm_resource_group.example.name
-  short_name          = "product"
+  short_name          = "eventhub"
 
   event_hub_receiver {
     event_hub_namespace     = azurerm_eventhub_namespace.example.name
@@ -43,17 +43,21 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example" {
   location            = azurerm_resource_group.example.location
   cluster_name        = azurerm_kubernetes_cluster.example.name
   name                = "ProductCounterRecordingRulesRuleGroup - ${azurerm_kubernetes_cluster.example.name}"
-  description         = "Model tuning required when product count increases by more than 100."
+  description         = "Model tuning required when product count increases."
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = [azurerm_monitor_workspace.example.id]
+  scopes = [
+    azurerm_monitor_workspace.example.id,
+    azurerm_kubernetes_cluster.example.id
+  ]
 
   rule {
-    alert      = "Product_Count_Increased_By_100"
+    alert      = "Total_Product_Count_Delta"
+    severity   = 3
     enabled    = true
     for        = "PT1M"
     expression = <<EOF
-increase(total_product_count[1m]) > 100
+idelta(total_product_count{job="product-service"}[2m]) >= 10
 EOF
 
     action {

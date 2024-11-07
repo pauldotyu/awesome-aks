@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Koi Pond Fountain",
+    "price": 32.99,
+    "description": "A pet water fountain designed to look like a koi pond.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Deep Sea Diver Toy",
+    "price": 9.99,
+    "description": "Rubbery chew toy shaped like a classic deep sea diver.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seafarer's Snack Bowl",
+    "price": 14.99,
+    "description": "Ceramic bowl with nautical designs for meal times.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Riptide Rope Tug",
+    "price": 7.49,
+    "description": "Braided rope toy for interactive tug-of-war games.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ocean Quest Fetch Stick",
+    "price": 8.99,
+    "description": "Floating fetch stick for beach or pool play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shell Seeker Treats",
+    "price": 4.49,
+    "description": "Grain-free treats made with real fish and sweet potatoes.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Bait Ball Treat Dispenser",
+    "price": 11.49,
+    "description": "Interactive ball that releases treats as your pet plays.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Driftwood Climbing Tree",
+    "price": 59.99,
+    "description": "A cat climbing tree made from real driftwood.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seagull Feather Cat Teaser",
+    "price": 6.99,
+    "description": "Teaser wand with feathers mimicking a seagull's flight.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Starfish Chew Toy",
+    "price": 5.99,
+    "description": "Chew toy with a textured surface for dental health.",
+    "image": "/placeholder.jpg"
+  }
+]

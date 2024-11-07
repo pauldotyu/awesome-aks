@@ -1,0 +1,72 @@
+[
+  {
+    "id": 0,
+    "name": "Shark Fin Life Vest",
+    "price": 17.99,
+    "description": "Stylish life vest with a shark fin for swimming safety.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pelican Plush Toy",
+    "price": 7.99,
+    "description": "Soft plush toy shaped like a pelican with a hidden squeaker.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Trawler Treat Dispenser",
+    "price": 11.99,
+    "description": "Boat-shaped treat dispenser that keeps dogs engaged.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seabird Feather Wand",
+    "price": 6.99,
+    "description": "Cat wand toy with feathers resembling seabirds.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Driftwood Chew Log",
+    "price": 5.49,
+    "description": "Natural wood chew toy to satisfy chewing habits.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Kelp Forest Cat Tunnel",
+    "price": 18.99,
+    "description": "Collapsible cat tunnel with kelp designs for hide-and-seek fun.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Maritime Rope Ball",
+    "price": 7.99,
+    "description": "Durable rope ball for endless games of fetch and tug.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Point Treats",
+    "price": 4.99,
+    "description": "Delicious treats to reward your pet on any adventure.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Clam Shell Squeaker",
+    "price": 6.49,
+    "description": "Fun squeaker toy shaped like a clam shell.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seafarer's Snack Pack",
+    "price": 9.99,
+    "description": "Assorted healthy snacks inspired by the sea.",
+    "image": "/placeholder.jpg"
+  }
+]
