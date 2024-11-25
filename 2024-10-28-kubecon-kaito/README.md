@@ -75,7 +75,9 @@ Open a new terminal, port-forward the product-service.
 kubectl port-forward -n pets svc/product-service 3002
 ```
 
-Open a new terminal and test the product-service metrics endpoint.
+Press **Ctrl+z** then type `bg` to move the process to the background.
+
+Test the product-service metrics endpoint.
 
 ```bash
 curl http://localhost:3002/metrics
@@ -84,7 +86,11 @@ curl http://localhost:3002/metrics
 Gradually import the test data.
 
 ```bash
-for i in {1..10}; do curl -X POST http://localhost:3002/import -H "Content-Type: application/json" --data-binary @testImport$i.json; echo "Processed testImport$i.json"; sleep 15; done
+for i in {1..10}; do
+  curl -X POST http://localhost:3002/import -H "Content-Type: application/json" --data-binary @testImport$i.json
+  echo "Processed testImport$i.json"
+  sleep 12
+done
 ```
 
 ## Cleanup

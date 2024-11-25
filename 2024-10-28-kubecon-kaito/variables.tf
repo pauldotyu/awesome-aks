@@ -18,6 +18,6 @@ variable "kaito_workspace_version" {
 
 variable "registry_repository_name" {
   type        = string
-  default     = "fine-tuned-adapters/kubernetes"
+  default     = "fine-tuned-adapters/products"
   description = "container registry repository name"
 }

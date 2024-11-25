@@ -42,7 +42,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   cluster_name        = azurerm_kubernetes_cluster.example.name
-  name                = "ProductCounterRecordingRulesRuleGroup - ${azurerm_kubernetes_cluster.example.name}"
+  name                = "ProductRecordingRulesRuleGroup - ${azurerm_kubernetes_cluster.example.name}"
   description         = "Model tuning required when product count increases."
   rule_group_enabled  = true
   interval            = "PT1M"
@@ -57,7 +57,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example" {
     enabled    = true
     for        = "PT1M"
     expression = <<EOF
-idelta(total_product_count{job="product-service"}[2m]) >= 10
+idelta(total_product_count{job="product-service"}[90s]) >= 10
 EOF
 
     action {
@@ -70,7 +70,7 @@ EOF
 
     alert_resolution {
       auto_resolved   = true
-      time_to_resolve = "PT1M"
+      time_to_resolve = "PT10M"
     }
   }
 }
