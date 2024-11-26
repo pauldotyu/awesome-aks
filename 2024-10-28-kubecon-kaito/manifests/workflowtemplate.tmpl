@@ -10,42 +10,119 @@ spec:
   templates:
     - name: tuning-pipeline
       steps:
-      - - name: process-data
-          template: download-data
-      - - name: tune-model
-          template: model-tuning
-    - name: download-data
+        - - name: generate-random-string
+            template: generate-random-string
+        - - name: process-data
+            template: process-data
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-random-string.outputs.parameters.timestamp}}"
+        - - name: tune-model
+            template: tune-model
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-random-string.outputs.parameters.timestamp}}"
+                - name: url
+                  value: "{{steps.process-data.outputs.parameters.url}}"
+    - name: generate-random-string
+      container:
+        image: alpine:3.14
+        command: [sh, -c]
+        args: ["echo $(date +%Y%m%d%H%M%S) > /tmp/timestamp.txt"]
+      outputs:
+        parameters:
+          - name: timestamp
+            valueFrom:
+              path: /tmp/timestamp.txt
+    - name: process-data
+      inputs:
+        parameters:
+          - name: timestamp
       container:
         image: python:3.12.4-alpine
         command: [python]
         source: |
-          import requests
           import pandas as pd
+          import requests
+          from datetime import datetime, timedelta
+          from azure.storage.blob import BlobServiceClient, BlobSasPermissions, generate_blob_sas
+          
+          # generate file name with timestamp
+          local_file_name = 'formatted-product-chats-{{inputs.parameters.timestamp}}.parquet'
+          
+          # download data from product-service
           response = requests.get('http://product-service:3002/ai/tuning/dataset')
           df = pd.DataFrame(response.json())
-          df.to_parquet('formatted-product-chats.parquet')
-          print(df)
-    - name: model-tuning
+          df.to_parquet(local_file_name)
+
+          # upload data to Azure Blob Storage
+          blob_service_client = BlobServiceClient.from_connection_string($CONNECTION_STRING)
+          container_name = 'datasets'
+          blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+          with open(local_file_name, 'rb') as data:
+              blob_client.upload_blob(data)
+          
+          # generate SAS token
+          container_client = blob_service_client.get_container_client(container_name)
+          blob_client = container_client.get_blob_client(local_file_name)
+          sas_token = generate_blob_sas(
+              account_name=blob_service_client.account_name,
+              container_name=container_client.container_name,
+              blob_name=blob_client.blob_name,
+              permission=BlobSasPermissions(read=True),
+              expiry=datetime.utcnow() + timedelta(hours=1),
+              account_key=$ACCOUNT_KEY
+          )
+
+          # generate SAS URL
+          sas_url = f'https://{blob_service_client.account_name}.blob.core.windows.net/{container_client.container_name}/{blob_client.blob_name}?{sas_token}'
+          
+          # write the url to a /tmp/sas_url.txt file
+          with open('/tmp/sas_url.txt', 'w') as f:
+              f.write(sas_url)
+        env:
+          - name: CONNECTION_STRING
+            valueFrom:
+              secretKeyRef:
+                name: mystoragesecret
+                key: connectionString
+          - name: ACCOUNT_KEY
+            valueFrom:
+              secretKeyRef:
+                name: mystoragesecret
+                key: accountKey
+      outputs:
+        parameters:
+          - name: url
+            valueFrom:
+              path: /tmp/sas_url.txt
+    - name: tune-model
+      inputs:
+        parameters:
+          - name: timestamp
+          - name: url
       resource:
         action: create
         manifest: |
           apiVersion: kaito.sh/v1alpha1
           kind: Workspace
           metadata:
-            name: workspace-phi-3-tuning
+            name: workspace-phi-3-tuning-{{inputs.parameters.timestamp}}
             namespace: ${NAMESPACE}
           resource:
             instanceType: Standard_NC24ads_A100_v4
             labelSelector:
               matchLabels:
-                app: phi-3-tuning
+                app: phi-3-tuning-{{inputs.parameters.timestamp}}
           tuning:
             preset:
               name: phi-3-mini-128k-instruct
             method: qlora
             input:
               urls:
-                - "https://huggingface.co/datasets/paulxyu/aks-store-demo/resolve/main/products.parquet?download=true"
+                - "{{inputs.parameters.url}}"
             output:
               image: "${REGISTRY}/${REPOSITORY}:1.0.0"
               imagePushSecret: myregistrysecret

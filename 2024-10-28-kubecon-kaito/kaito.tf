@@ -97,3 +97,34 @@ resource "kubernetes_secret" "eventhub" {
     "sharedAccessKey"     = azurerm_eventhub_namespace.example.default_primary_key
   }
 }
+
+resource "azurerm_storage_account" "example" {
+  name                     = "sto${local.random_name}"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  account_kind             = "StorageV2"
+  is_hns_enabled           = "true"
+}
+
+resource "azurerm_storage_container" "example" {
+  name                  = "datasets"
+  storage_account_name  = azurerm_storage_account.example.name
+  container_access_type = "private"
+}
+
+# Create a secret to store azure storage account key and connection string
+resource "kubernetes_secret" "storage" {
+  metadata {
+    name      = "mystoragesecret"
+    namespace = kubernetes_namespace.example.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    "connectionString" = azurerm_storage_account.example.primary_connection_string
+    "accountKey"       = azurerm_storage_account.example.primary_access_key
+  }
+}
