@@ -98,6 +98,54 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: ${NAMESPACE}
+  name: workflowtaskresults-creator
+rules:
+- apiGroups: ["argoproj.io"]
+  resources: ["workflowtaskresults"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: ${NAMESPACE}
+  name: create-workflowtaskresults
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ${NAMESPACE}
+roleRef:
+  kind: Role
+  name: workflowtaskresults-creator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ${NAMESPACE}
+  name: workflowtaskresults-patcher
+rules:
+- apiGroups: ["argoproj.io"]
+  resources: ["workflowtaskresults"]
+  verbs: ["patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: ${NAMESPACE}
+  name: patch-workflowtaskresults
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ${NAMESPACE}
+roleRef:
+  kind: Role
+  name: workflowtaskresults-patcher
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ${NAMESPACE}
   name: kaito-workspace-admin
 rules:
 - apiGroups: ["kaito.sh"]
@@ -117,4 +165,3 @@ roleRef:
   kind: Role
   name: kaito-workspace-admin
   apiGroup: rbac.authorization.k8s.io
-
