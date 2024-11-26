@@ -9,11 +9,43 @@ spec:
     secondsAfterCompletion: 43200 # Set TTL to 12 hours (12 hours * 3600 seconds/hour)
   templates:
     - name: tuning-pipeline
-      dag:
-        tasks:
-          - name: tune-model
-            template: model-tuning
-    - name: model-tuning
+      steps:
+      - - name: process-data
+          template: download-data
+      - - name: tune-model
+          template: model-tuning
+    - name: download-data
       container:
-        image: busybox
-        command: ["echo", "Step A: Model Fine-Tuning"]
+        image: python:3.12.4-alpine
+        command: [python]
+        source: |
+          import requests
+          import pandas as pd
+          response = requests.get('http://product-service:3002/ai/tuning/dataset')
+          df = pd.DataFrame(response.json())
+          df.to_parquet('formatted-product-chats.parquet')
+          print(df)
+    - name: model-tuning
+      resource:
+        action: create
+        manifest: |
+          apiVersion: kaito.sh/v1alpha1
+          kind: Workspace
+          metadata:
+            name: workspace-phi-3-tuning
+            namespace: ${NAMESPACE}
+          resource:
+            instanceType: Standard_NC24ads_A100_v4
+            labelSelector:
+              matchLabels:
+                app: phi-3-tuning
+          tuning:
+            preset:
+              name: phi-3-mini-128k-instruct
+            method: qlora
+            input:
+              urls:
+                - "https://huggingface.co/datasets/paulxyu/aks-store-demo/resolve/main/products.parquet?download=true"
+            output:
+              image: "${REGISTRY}/${REPOSITORY}:1.0.0"
+              imagePushSecret: myregistrysecret

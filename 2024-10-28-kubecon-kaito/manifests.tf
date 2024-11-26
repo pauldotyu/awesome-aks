@@ -40,7 +40,9 @@ resource "local_file" "workflowtemplate" {
   filename = "manifests/workflowtemplate.yaml"
   content = templatefile("manifests/workflowtemplate.tmpl",
     {
-      NAMESPACE = kubernetes_namespace.example.metadata[0].name
+      NAMESPACE  = kubernetes_namespace.example.metadata[0].name
+      REGISTRY   = azurerm_container_registry.example.login_server
+      REPOSITORY = var.registry_repository_name
     }
   )
 }

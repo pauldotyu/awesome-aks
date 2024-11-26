@@ -69,3 +69,28 @@ roleRef:
   kind: Role
   name: workflow-reader
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ${NAMESPACE}
+  name: kaito-workspace-admin
+rules:
+- apiGroups: ["kaito.sh"]
+  resources: ["workspaces"]
+  verbs: ["create", "delete", "patch", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: ${NAMESPACE}
+  name: admin-kaito-workspaces
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ${NAMESPACE}
+roleRef:
+  kind: Role
+  name: kaito-workspace-admin
+  apiGroup: rbac.authorization.k8s.io
+
