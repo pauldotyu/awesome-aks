@@ -2,6 +2,30 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: ${NAMESPACE}
+  name: pod-patcher
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: ${NAMESPACE}
+  name: patch-pods
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ${NAMESPACE}
+roleRef:
+  kind: Role
+  name: pod-patcher
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ${NAMESPACE}
   name: workflowtemplate-reader
 rules:
 - apiGroups: ["argoproj.io"]

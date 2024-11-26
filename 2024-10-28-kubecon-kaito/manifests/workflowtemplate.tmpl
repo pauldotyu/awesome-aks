@@ -10,55 +10,56 @@ spec:
   templates:
     - name: tuning-pipeline
       steps:
-        - - name: generate-random-string
-            template: generate-random-string
-        - - name: process-data
-            template: process-data
+        - - name: generate
+            template: generate-version
+        - - name: process
+            template: process-dataset
             arguments:
               parameters:
-                - name: timestamp
-                  value: "{{steps.generate-random-string.outputs.parameters.timestamp}}"
-        - - name: tune-model
+                - name: version
+                  value: "{{steps.generate.outputs.result}}"
+        - - name: tune
             template: tune-model
             arguments:
               parameters:
-                - name: timestamp
-                  value: "{{steps.generate-random-string.outputs.parameters.timestamp}}"
-                - name: url
-                  value: "{{steps.process-data.outputs.parameters.url}}"
-    - name: generate-random-string
-      container:
-        image: alpine:3.14
-        command: [sh, -c]
-        args: ["echo $(date +%Y%m%d%H%M%S) > /tmp/timestamp.txt"]
-      outputs:
-        parameters:
-          - name: timestamp
-            valueFrom:
-              path: /tmp/timestamp.txt
-    - name: process-data
-      inputs:
-        parameters:
-          - name: timestamp
-      container:
-        image: python:3.12.4-alpine
+                - name: version
+                  value: "{{steps.generate.outputs.result}}"
+                - name: dataset
+                  value: "{{steps.process.outputs.result}}"
+    - name: generate-version
+      script:
+        image: python:3.13.0-bullseye
         command: [python]
         source: |
+          import time
+          timestamp = int(time.time())
+          print(timestamp)
+    - name: process-dataset
+      inputs:
+        parameters:
+          - name: version
+      script:
+        image: python:3.13.0-bullseye
+        command: [sh, -c]
+        source: |
+          pip install pandas==2.2.3 pyarrow==18.1.0 requests==2.32.3 azure.storage.blob==12.24.0 > /dev/null
+          python -c "
+          import os
           import pandas as pd
           import requests
           from datetime import datetime, timedelta
           from azure.storage.blob import BlobServiceClient, BlobSasPermissions, generate_blob_sas
-          
-          # generate file name with timestamp
-          local_file_name = 'formatted-product-chats-{{inputs.parameters.timestamp}}.parquet'
+
+          # generate file name with version
+          local_file_name = 'formatted-product-chats-{{inputs.parameters.version}}.parquet'
           
           # download data from product-service
           response = requests.get('http://product-service:3002/ai/tuning/dataset')
           df = pd.DataFrame(response.json())
           df.to_parquet(local_file_name)
-
+          
           # upload data to Azure Blob Storage
-          blob_service_client = BlobServiceClient.from_connection_string($CONNECTION_STRING)
+          blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_STORAGE_CONNECTION_STRING'))
           container_name = 'datasets'
           blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
           with open(local_file_name, 'rb') as data:
@@ -73,56 +74,49 @@ spec:
               blob_name=blob_client.blob_name,
               permission=BlobSasPermissions(read=True),
               expiry=datetime.utcnow() + timedelta(hours=1),
-              account_key=$ACCOUNT_KEY
+              account_key=os.getenv('AZURE_STORAGE_ACCOUNT_KEY')
           )
 
           # generate SAS URL
           sas_url = f'https://{blob_service_client.account_name}.blob.core.windows.net/{container_client.container_name}/{blob_client.blob_name}?{sas_token}'
-          
-          # write the url to a /tmp/sas_url.txt file
-          with open('/tmp/sas_url.txt', 'w') as f:
-              f.write(sas_url)
+          print(sas_url)
+          "
         env:
-          - name: CONNECTION_STRING
+          - name: AZURE_STORAGE_CONNECTION_STRING
             valueFrom:
               secretKeyRef:
                 name: mystoragesecret
                 key: connectionString
-          - name: ACCOUNT_KEY
+          - name: AZURE_STORAGE_ACCOUNT_KEY
             valueFrom:
               secretKeyRef:
                 name: mystoragesecret
                 key: accountKey
-      outputs:
-        parameters:
-          - name: url
-            valueFrom:
-              path: /tmp/sas_url.txt
     - name: tune-model
       inputs:
         parameters:
-          - name: timestamp
-          - name: url
+          - name: version
+          - name: dataset
       resource:
         action: create
         manifest: |
           apiVersion: kaito.sh/v1alpha1
           kind: Workspace
           metadata:
-            name: workspace-phi-3-tuning-{{inputs.parameters.timestamp}}
+            name: workspace-phi-3-tuning-{{inputs.parameters.version}}
             namespace: ${NAMESPACE}
           resource:
             instanceType: Standard_NC24ads_A100_v4
             labelSelector:
               matchLabels:
-                app: phi-3-tuning-{{inputs.parameters.timestamp}}
+                app: phi-3-tuning-{{inputs.parameters.version}}
           tuning:
             preset:
               name: phi-3-mini-128k-instruct
             method: qlora
             input:
               urls:
-                - "{{inputs.parameters.url}}"
+                - "{{inputs.parameters.dataset}}"
             output:
-              image: "${REGISTRY}/${REPOSITORY}:1.0.0"
+              image: "${REGISTRY}/${REPOSITORY}:{{inputs.parameters.version}}"
               imagePushSecret: myregistrysecret
