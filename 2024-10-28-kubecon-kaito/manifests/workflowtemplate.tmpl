@@ -26,6 +26,18 @@ spec:
                   value: "{{steps.generate.outputs.result}}"
                 - name: dataset
                   value: "{{steps.process.outputs.result}}"
+        - - name: watch
+            template: watch-workspace
+            arguments:
+              parameters:
+                - name: version
+                  value: "{{steps.generate.outputs.result}}"
+        - - name: replace
+            template: replace-workspace
+            arguments:
+              parameters:
+                - name: version
+                  value: "{{steps.generate.outputs.result}}"
     - name: generate-version
       script:
         image: python:3.13.0-bullseye
@@ -120,3 +132,45 @@ spec:
             output:
               image: "${REGISTRY}/${REPOSITORY}:{{inputs.parameters.version}}"
               imagePushSecret: myregistrysecret
+    - name: watch-workspace
+      inputs:
+        parameters:
+          - name: version
+      script:
+        image: bitnami/kubectl:1.30.6
+        command: [sh, -c]
+        source: |
+          until kubectl get workspace -n ${NAMESPACE} workspace-phi-3-tuning-{{inputs.parameters.version}} -ojsonpath='{.status.conditions[?(@.type=="WorkspaceSucceeded")].status}' | grep -q 'True'; do
+            echo "Waiting for workspace to succeed..."
+            sleep 10
+          done
+    - name: replace-workspace
+      inputs:
+        parameters:
+          - name: version
+      script:
+        image: bitnami/kubectl:1.30.6
+        command: [sh, -c]
+        source: |
+          kubectl replace -n ${NAMESPACE} -f - <<EOF
+          apiVersion: kaito.sh/v1alpha1
+          kind: Workspace
+          metadata:
+            name: workspace-phi-3-mini
+          resource:
+            instanceType: Standard_NC6s_v3
+            labelSelector:
+              matchLabels:
+                apps: phi-3
+          inference:
+            preset:
+              name: phi-3-mini-128k-instruct
+            adapters:
+              - source:
+                  name: products-adapter
+                  image: ${REGISTRY}/${REPOSITORY}:{{inputs.parameters.version}}
+                  imagePullSecrets:
+                    - myregistrysecret
+                strength: "1.0"
+          EOF
+
