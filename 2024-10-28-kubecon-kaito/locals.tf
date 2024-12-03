@@ -1,3 +1,3 @@
 locals {
-  random_name = "bigbertha${random_integer.example.result}"
+  random_name = "llmopsdemo${random_integer.example.result}"
 }

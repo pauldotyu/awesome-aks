@@ -1,6 +1,6 @@
 variable "location" {
   type        = string
-  default     = "brazilsouth"
+  default     = "eastus"
   description = "value of location"
 }
 
