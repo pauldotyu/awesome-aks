@@ -46,3 +46,12 @@ resource "local_file" "workflowtemplate" {
     }
   )
 }
+
+resource "local_file" "workflowuiauthz" {
+  filename = "manifests/workflowuiauthz.yaml"
+  content = templatefile("manifests/workflowuiauthz.tmpl",
+    {
+      NAMESPACE  = kubernetes_namespace.example.metadata[0].name
+    }
+  )
+}

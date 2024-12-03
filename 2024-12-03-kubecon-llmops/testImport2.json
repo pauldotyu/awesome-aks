@@ -1,0 +1,114 @@
+[
+  {
+    "id": 0,
+    "name": "Captain's Coat Costume",
+    "price": 14.99,
+    "description": "Dress your pet as a ship's captain for special occasions.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shell Collector Treat Pouch",
+    "price": 12.49,
+    "description": "Convenient pouch for carrying treats during walks.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pirate Flag Bandana",
+    "price": 5.99,
+    "description": "Stylish bandana featuring a pirate flag design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Master's Harness",
+    "price": 19.99,
+    "description": "Comfortable harness with a nautical theme.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seaside Scent Shampoo",
+    "price": 8.99,
+    "description": "Pet shampoo that leaves a fresh seaside scent.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ocean Odyssey Puzzle Toy",
+    "price": 16.99,
+    "description": "Interactive puzzle toy that challenges your pet's mind.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Beachcomber's Ball",
+    "price": 6.49,
+    "description": "Textured ball that massages gums during play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Rose ID Tag",
+    "price": 4.99,
+    "description": "Elegant ID tag with a compass rose engraving.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Admiral's Adjustable Collar",
+    "price": 13.99,
+    "description": "Premium adjustable collar with nautical accents.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shoreline Chew Stick",
+    "price": 5.99,
+    "description": "Natural chew stick sourced from sustainable materials.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Koi Pond Fountain",
+    "price": 32.99,
+    "description": "A pet water fountain designed to look like a koi pond.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Deep Sea Diver Toy",
+    "price": 9.99,
+    "description": "Rubbery chew toy shaped like a classic deep sea diver.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seafarer's Snack Bowl",
+    "price": 14.99,
+    "description": "Ceramic bowl with nautical designs for meal times.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Riptide Rope Tug",
+    "price": 7.49,
+    "description": "Braided rope toy for interactive tug-of-war games.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ocean Quest Fetch Stick",
+    "price": 8.99,
+    "description": "Floating fetch stick for beach or pool play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shell Seeker Treats",
+    "price": 4.49,
+    "description": "Grain-free treats made with real fish and sweet potatoes.",
+    "image": "/placeholder.jpg"
+  }
+]

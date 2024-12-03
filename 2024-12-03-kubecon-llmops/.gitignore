@@ -4,3 +4,4 @@ manifests/eventsource.yaml
 manifests/servicemonitor.yaml
 manifests/workflowtemplate.yaml
 manifests/workflowauthz.yaml
+manifests/workflowuiauthz.yaml

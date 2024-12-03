@@ -1,0 +1,275 @@
+[
+  {
+    "id": 0,
+    "name": "Seaglass Chew Toy",
+    "price": 8.49,
+    "description": "Smooth, durable chew toy mimicking ocean-tumbled glass.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sandy Paws Grooming Mitt",
+    "price": 11.99,
+    "description": "Grooming mitt that removes loose hair while petting your furry friend.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Whale Water Sprinkler Toy",
+    "price": 13.99,
+    "description": "Connects to a hose for splashing fun during hot days.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Coral Crunch Dental Stick",
+    "price": 7.99,
+    "description": "Chew stick that promotes dental health with a coral design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Message in a Bottle Toy",
+    "price": 9.49,
+    "description": "Hide treats inside for a rewarding playtime experience.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Bait Ball Treat Dispenser",
+    "price": 11.49,
+    "description": "Interactive ball that releases treats as your pet plays.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Driftwood Climbing Tree",
+    "price": 59.99,
+    "description": "A cat climbing tree made from real driftwood.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seagull Feather Cat Teaser",
+    "price": 6.99,
+    "description": "Teaser wand with feathers mimicking a seagull's flight.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Starfish Chew Toy",
+    "price": 5.99,
+    "description": "Chew toy with a textured surface for dental health.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Neptune's Nibbles",
+    "price": 7.49,
+    "description": "Fish-shaped treats packed with omega-3 fatty acids.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sunken Treasure Toy Box",
+    "price": 27.99,
+    "description": "A toy storage box that looks like a treasure chest.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sand Dollar Chew Disc",
+    "price": 6.49,
+    "description": "Durable chew disc perfect for fetch and chew sessions.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Wave Rider Frisbee",
+    "price": 8.99,
+    "description": "Aerodynamic frisbee designed for long-distance throws.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Coral Cove Hideout",
+    "price": 21.99,
+    "description": "A cozy hideout for small pets shaped like a coral cove.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pirate's Map Bedding",
+    "price": 18.99,
+    "description": "Comfortable bedding with a fun pirate map design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Deep Sea Dental Rope",
+    "price": 7.99,
+    "description": "Rope toy that cleans teeth while your dog plays.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Tug Boat Toy",
+    "price": 10.99,
+    "description": "Floating tug boat toy great for water fetch games.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Submarine Squeak Toy",
+    "price": 9.49,
+    "description": "Squeaky toy shaped like a submarine for underwater fun.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lagoon Treat Dispenser",
+    "price": 12.99,
+    "description": "Challenge your pet with this lagoon-themed treat dispenser.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pirate's Parrot Plush",
+    "price": 7.49,
+    "description": "Colorful parrot plush toy with a hidden squeaker.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Beach Buddy Cooling Bandana",
+    "price": 6.99,
+    "description": "Keep your pet cool with this water-activated cooling bandana.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Whirlpool Water Bowl",
+    "price": 22.99,
+    "description": "Circulating water bowl to encourage hydration.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Chew Compass",
+    "price": 5.99,
+    "description": "Durable chew toy shaped like a compass.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Captain's Cutlass Tug Toy",
+    "price": 8.49,
+    "description": "Tug toy shaped like a pirate's cutlass for adventurous play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Serpent Plush Toy",
+    "price": 12.49,
+    "description": "Extra-long plush toy for dogs who love to thrash and tug.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Hound Dog Jacket",
+    "price": 24.99,
+    "description": "Stylish jacket to keep your dog warm on breezy days.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Gill's Fish Bone Chew",
+    "price": 6.49,
+    "description": "Natural chew shaped like a fish bone.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sunset Beach Collar",
+    "price": 11.99,
+    "description": "Brightly colored collar inspired by beach sunsets.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Voyager's Vest Harness",
+    "price": 19.99,
+    "description": "Comfortable vest harness for daily walks.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Buoy Buddy Floating Toy",
+    "price": 9.99,
+    "description": "Floating toy perfect for fetch in pools or lakes.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ocean Mist Grooming Spray",
+    "price": 8.49,
+    "description": "Leave-in conditioning spray with an ocean scent.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Turtle Slow Feeder",
+    "price": 14.99,
+    "description": "Slow feeder bowl designed to look like a sea turtle.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Buccaneer's Booty Treats",
+    "price": 7.99,
+    "description": "Delicious treats that your pet will treasure.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Marine Rope Collar",
+    "price": 13.49,
+    "description": "Durable collar made from marine-grade rope.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Treasure Map Chew Toy",
+    "price": 9.49,
+    "description": "Chew toy with a printed treasure map design.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Nautical Nightlight",
+    "price": 16.99,
+    "description": "A soothing nightlight for pets with a nautical theme.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Mermaid's Morsels Cat Treats",
+    "price": 4.99,
+    "description": "Tasty fish treats that even a mermaid's cat would love.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Ship Wheel Scratcher",
+    "price": 25.99,
+    "description": "Cat scratcher designed like a ship's wheel.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Breeze Cooling Mat",
+    "price": 27.99,
+    "description": "Self-cooling mat to keep your pet comfortable on hot days.",
+    "image": "/placeholder.jpg"
+  }
+]

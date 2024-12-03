@@ -1,0 +1,226 @@
+[
+  {
+    "id": 0,
+    "name": "Ocean Breeze Catnip",
+    "price": 3.99,
+    "description": "Organic catnip to delight your cat, with a hint of ocean breeze scent.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shell Shocked Chew Bone",
+    "price": 9.99,
+    "description": "A long-lasting chew bone shaped like a seashell for teething puppies.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Frisbee",
+    "price": 7.99,
+    "description": "Navigate fun with the Compass Frisbee, perfect for high-flying fetch games.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Mariner's Mouse Trio",
+    "price": 5.99,
+    "description": "Set of three plush mice toys dressed as mariners for endless cat fun.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Fishing Rod Teaser",
+    "price": 8.99,
+    "description": "Interactive play with the Fishing Rod Teaser, featuring a dangling fish toy.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Life Ring Chew Toy",
+    "price": 6.99,
+    "description": "A ring-shaped chew toy ideal for teething puppies and active chewers.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Harbor Hideout Cat Condo",
+    "price": 49.99,
+    "description": "A multi-level cat condo designed to look like a harbor, with plenty of spots to lounge.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sandy Shores Play Mat",
+    "price": 24.99,
+    "description": "Comfortable play mat with seaside designs for pets to relax on.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Bubble Blower Dog Toy",
+    "price": 13.99,
+    "description": "Automatic bubble blower that releases bacon-scented bubbles for dogs.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seaweed Crunch Treats",
+    "price": 4.99,
+    "description": "Healthy treats made with real seaweed for a tasty snack.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Captain's Log Chew Stick",
+    "price": 7.49,
+    "description": "Natural chew stick resembling a captain's log for gnawing pleasure.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lighthouse Laser Pointer",
+    "price": 9.99,
+    "description": "Keep your cat active with the Lighthouse Laser Pointer.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Minnow Tug Toy",
+    "price": 5.99,
+    "description": "A small but durable tug toy shaped like a minnow.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Barnacle Bite Toy",
+    "price": 6.49,
+    "description": "Textured chew toy that helps clean teeth during play.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Nautical Knot Chew Rope",
+    "price": 8.99,
+    "description": "Sturdy chew rope with nautical knots for aggressive chewers.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Reef Explorer Snuffle Mat",
+    "price": 19.99,
+    "description": "Interactive feeding mat that stimulates your pet's foraging instincts.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Captain's Hat Costume",
+    "price": 9.99,
+    "description": "Dress your pet as the captain with this adorable hat.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Shark Fin Life Vest",
+    "price": 17.99,
+    "description": "Stylish life vest with a shark fin for swimming safety.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pelican Plush Toy",
+    "price": 7.99,
+    "description": "Soft plush toy shaped like a pelican with a hidden squeaker.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Trawler Treat Dispenser",
+    "price": 11.99,
+    "description": "Boat-shaped treat dispenser that keeps dogs engaged.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seabird Feather Wand",
+    "price": 6.99,
+    "description": "Cat wand toy with feathers resembling seabirds.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Driftwood Chew Log",
+    "price": 5.49,
+    "description": "Natural wood chew toy to satisfy chewing habits.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Kelp Forest Cat Tunnel",
+    "price": 18.99,
+    "description": "Collapsible cat tunnel with kelp designs for hide-and-seek fun.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Maritime Rope Ball",
+    "price": 7.99,
+    "description": "Durable rope ball for endless games of fetch and tug.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Compass Point Treats",
+    "price": 4.99,
+    "description": "Delicious treats to reward your pet on any adventure.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Clam Shell Squeaker",
+    "price": 6.49,
+    "description": "Fun squeaker toy shaped like a clam shell.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seafarer's Snack Pack",
+    "price": 9.99,
+    "description": "Assorted healthy snacks inspired by the sea.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Marine Mammal Plush Set",
+    "price": 14.99,
+    "description": "Set of plush toys including a whale, dolphin, and seal.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lagoon Lounge Bed",
+    "price": 39.99,
+    "description": "Comfortable pet bed resembling a tranquil lagoon.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seaside Snuggle Blanket",
+    "price": 19.99,
+    "description": "Soft blanket with seaside patterns for cozy naps.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Barnacle Ball Treat Toy",
+    "price": 12.99,
+    "description": "Fill with treats to keep your pet engaged and mentally stimulated.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Saltwater Taffy Chews",
+    "price": 6.99,
+    "description": "Chew treats that taste like the seaside favorite, minus the sugar.",
+    "image": "/placeholder.jpg"
+  }
+]

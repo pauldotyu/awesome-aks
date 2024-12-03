@@ -57,7 +57,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example" {
     enabled    = true
     for        = "PT1M"
     expression = <<EOF
-abs(delta(total_product_count{job="product-service"}[90s])) >= 10
+idelta(total_product_count{job="product-service"}[60s]) > 0
 EOF
 
     action {
@@ -70,7 +70,7 @@ EOF
 
     alert_resolution {
       auto_resolved   = true
-      time_to_resolve = "PT10M"
+      time_to_resolve = "PT30M"
     }
   }
 }

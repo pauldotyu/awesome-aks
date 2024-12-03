@@ -1,0 +1,93 @@
+[
+  {
+    "id": 0,
+    "name": "Tropical Turtle Chew Toy",
+    "price": 7.99,
+    "description": "Delight your pet with the Tropical Turtle Chew Toy, designed to promote healthy teeth and gums.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Pirate Ship Scratch Post",
+    "price": 29.99,
+    "description": "Give your cat a nautical adventure with the Pirate Ship Scratch Post.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Seashell Fetch Ball",
+    "price": 5.99,
+    "description": "Enjoy a game of fetch with the Seashell Fetch Ball, perfect for beach outings.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Octopus Tug Toy",
+    "price": 9.99,
+    "description": "Interactive play reaches new depths with the Octopus Tug Toy.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Mermaid Wand Cat Teaser",
+    "price": 6.99,
+    "description": "Enchant your feline with the Mermaid Wand Cat Teaser, featuring sparkly ribbons.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Lobster Squeak Toy",
+    "price": 8.49,
+    "description": "Add some seaside fun to playtime with the Lobster Squeak Toy.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Dolphin Dive Fetch Stick",
+    "price": 7.49,
+    "description": "Make a splash with the Dolphin Dive Fetch Stick, ideal for water-loving dogs.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Crab Claw Chew Toy",
+    "price": 4.99,
+    "description": "Satisfy your pup's chewing instincts with the durable Crab Claw Chew Toy.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sailboat Pet Bed",
+    "price": 34.99,
+    "description": "Let your pet sail into dreamland with the cozy Sailboat Pet Bed.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Wave Pattern Collar",
+    "price": 12.99,
+    "description": "Stylish and sturdy, the Wave Pattern Collar is perfect for seaside walks.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Anchor Rope Leash",
+    "price": 15.99,
+    "description": "Secure your walks with the durable Anchor Rope Leash.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Fish Basket Hideaway",
+    "price": 22.99,
+    "description": "A cozy hideaway shaped like a fish basket for your feline friend.",
+    "image": "/placeholder.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Sea Star Plush Toy",
+    "price": 6.49,
+    "description": "Soft and cuddly, the Sea Star Plush Toy is perfect for snuggles.",
+    "image": "/placeholder.jpg"
+  }
+]

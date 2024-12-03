@@ -6,3 +6,4 @@ resources:
   - eventsource.yaml
   - workflowauthz.yaml
   - workflowtemplate.yaml
+  - workflowuiauthz.yaml

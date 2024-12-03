@@ -19,7 +19,7 @@ az aks get-credentials -g $(terraform output -raw rg_name) -n $(terraform output
 Deploy the ArgoCD application which deploys the AKS Store Demo app.
 
 ```bash
-kubectl apply -n argocd -f https://raw.githubusercontent.com/pauldotyu/aks-store-demo/refs/heads/bigbertha/sample-manifests/argocd/pets.yaml
+kubectl apply -n argocd -f https://raw.githubusercontent.com/pauldotyu/aks-store-demo/refs/heads/main/sample-manifests/argocd/pets.yaml
 ```
 
 Watch the pods roll out.
@@ -55,19 +55,7 @@ AMA_METRICS_POD_NAME="$(kubectl get po -n kube-system -lrsName=ama-metrics -o js
 kubectl port-forward $AMA_METRICS_POD_NAME -n kube-system 9090
 ```
 
-If the first pod does not show the job configuration, try the second pod.
-
-```bash
-AMA_METRICS_POD_NAME="$(kubectl get po -n kube-system -lrsName=ama-metrics -o jsonpath='{.items[1].metadata.name}')"
-kubectl port-forward $AMA_METRICS_POD_NAME -n kube-system 9090
-```
-
-Follow the logs of the sensor pod.
-
-```bash
-SENSOR_POD_NAME=$(kubectl get po -n pets -l owner-name=tuning-sensor -ojsonpath='{.items[0].metadata.name}')
-kubectl logs -n pets $SENSOR_POD_NAME -f
-```
+> If the first pod does not show the job configuration, try the second pod.
 
 Open a new terminal, port-forward the product-service.
 
@@ -86,11 +74,18 @@ curl http://localhost:3002/metrics
 Gradually import the test data.
 
 ```bash
-for i in {1..10}; do
+for i in {1..4}; do
   curl -X POST http://localhost:3002/import -H "Content-Type: application/json" --data-binary @testImport$i.json
   echo "Processed testImport$i.json"
-  sleep 10
+  sleep 30
 done
+```
+
+Follow the logs of the sensor pod.
+
+```bash
+SENSOR_POD_NAME=$(kubectl get po -n pets -l owner-name=tuning-sensor -ojsonpath='{.items[0].metadata.name}')
+kubectl logs -n pets $SENSOR_POD_NAME -f
 ```
 
 After 2 minutes or so, check the logs of the sensor pod. You should see the logs that look like the following:
@@ -130,6 +125,16 @@ You can also use the workflow name to check the logs of the tuning pipeline pod.
 
 ```bash
 kubectl logs -n pets -lworkflows.argoproj.io/workflow=tuning-pipeline-jphf2
+```
+
+
+Argo Workflows UI setup
+
+```bash
+ARGO_TOKEN="Bearer $(kubectl get secret -n pets argo-workflow-ui-reader-service-account-token -o=jsonpath='{.data.token}' | base64 --decode)"
+echo $ARGO_TOKEN
+
+kubectl port-forward svc/argoworkflows-release-argo-workflows-server -n argo 2746:2746
 ```
 
 ## Cleanup

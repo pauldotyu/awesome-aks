@@ -1,0 +1,64 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-workflow-ui-readonly
+  namespace: ${NAMESPACE}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - events
+      - pods
+      - pods/log
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - eventsources
+      - sensors
+      - workflows
+      - workfloweventbindings
+      - workflowtemplates
+      - clusterworkflowtemplates
+      - cronworkflows
+      - workflowtaskresults
+    verbs:
+      - create
+      - delete
+      - update
+      - patch
+      - get
+      - list
+      - watch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-workflow-ui-reader
+  namespace: ${NAMESPACE}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-workflow-ui-reader-role
+  namespace: ${NAMESPACE}
+subjects:
+- kind: ServiceAccount
+  name: argo-workflow-ui-reader
+  namespace: ${NAMESPACE}
+roleRef:
+  kind: Role
+  name: argo-workflow-ui-readonly 
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argo-workflow-ui-reader-service-account-token
+  namespace: ${NAMESPACE}
+  annotations:
+    kubernetes.io/service-account.name: argo-workflow-ui-reader
+type: kubernetes.io/service-account-token
