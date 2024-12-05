@@ -1,6 +1,20 @@
 # LLMOps with AKS and KAITO
 
-Work in progress...
+This is a sample architecture on how to implement LLMOps with Azure Kubernetes Service (AKS) and KAITO. This solution takes inspiration from the [BigBertha](https://github.com/aishwaryaprabhat/BigBertha) project and is modified to work for a AKS Store Demo application use case.
+
+Below is a high-level architecture diagram of the solution.
+
+![Architecture](./architecture.png)
+
+An AKS cluster is set up with a AKS Store demo app and KAITO inference workspace deployed via ArgoCD.  
+
+The KAITO installation within the cluster is also used for model fine-tuning purposes. To support this, Azure Blob storage is used to store the fine-tuning input datasets along with an Azure Container Registry to store the fine-tuned output adapters.
+
+The deployment also includes cloud-native observability tools which includes an Azure-managed Grafana and Prometheus stack. A Prometheus ServiceMonitor custom resource is configured to scrape product count metrics every 30 seconds. Furthermore, a Prometheus rule group is setup to trigger alerts if there's an increase in product count by a specific threshold over a defined period.
+
+When thresholds are exceeded, the Prometheus rule group sends an alert notification to Azure Event Hub, which triggers further actions. Importantly, an Argo Event sensor is configured to listen to this event hub and, upon detection of any new events, triggers an Argo Workflow template for execution. 
+
+The workflow template is responsible for generating a fine-tuning input dataset, store it in Azure Blob storage, then create a new KAITO fine-tuning workspace using the input dataset. When the fine-tuning is complete, the output adapter is stored in Azure Container Registry. From there, KAITO inference workspace is replaced with one with a fine-tuned adapter for customizing the model's predictions.
 
 ## Azure Infrastructure Provisioning
 
