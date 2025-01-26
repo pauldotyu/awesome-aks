@@ -55,6 +55,9 @@ func main() {
 					LocationName:     pulumi.String("westus"),
 				},
 			},
+			ApiProperties: &documentdb.ApiPropertiesArgs{
+				ServerVersion: pulumi.String("7.0"),
+			},
 		})
 		if err != nil {
 			return err
@@ -164,10 +167,10 @@ func main() {
 			},
 			AgentPoolProfiles: containerservice.ManagedClusterAgentPoolProfileArray{
 				&containerservice.ManagedClusterAgentPoolProfileArgs{
-					Mode: pulumi.String("System"),
-					Name: pulumi.String("systempool"),
-					// VmSize: pulumi.String("Standard_DS4_v2"),
-					Count: pulumi.Int(3),
+					Mode:   pulumi.String("System"),
+					Name:   pulumi.String("systempool"),
+					VmSize: pulumi.String("Standard_D4pds_v6"),
+					Count:  pulumi.Int(3),
 				},
 			},
 			AddonProfiles: containerservice.ManagedClusterAddonProfileMap{
