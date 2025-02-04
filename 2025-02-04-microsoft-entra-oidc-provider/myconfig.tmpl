@@ -1,0 +1,13 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+        extraArgs:
+          oidc-issuer-url: https://login.microsoftonline.com/${TENANT_ID}/v2.0
+          oidc-client-id: ${CLIENT_ID}
+          oidc-username-claim: email
+          oidc-groups-claim: groups
