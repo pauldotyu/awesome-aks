@@ -23,6 +23,8 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
+  
+  skip_provider_registration = true
 }
 
 data "azurerm_client_config" "pre03" {}
