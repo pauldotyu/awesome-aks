@@ -1,0 +1,13 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraMounts:
+    - hostPath: /Users/paul/repos/pauldotyu/awesome-aks/2025-02-05-microsoft-entra-structured-auth/configs
+      containerPath: /mnt/configs
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+        extraArgs:
+          authentication-config: /mnt/configs/auth.yaml
