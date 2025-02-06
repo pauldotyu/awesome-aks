@@ -5,11 +5,11 @@ This demo walks you through the steps to configure Microsoft Entra ID as an OIDC
 ## Prerequisites
 
 - [Microsoft Entra](https://learn.microsoft.com/entra/fundamentals/what-is-entra) account with permissions to create an application registration, group, and assign users to the group.
+- [Okta Developer](https://developer.okta.com/) account with permissions to create an application registration, group, and assign users to the group.
 - [Terraform CLI](https://developer.hashicorp.com/terraform/install?product_intent=terraform)
 - [KIND (Kubernetes in Docker)](https://kind.sigs.k8s.io/)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 - [krew](https://krew.sigs.k8s.io/docs/user-guide/quickstart/) to install [kubelogin also known as oidc-login](https://github.com/int128/kubelogin?tab=readme-ov-file#setup)
-
 
 ## Create an application registration in Microsoft Entra ID
 
@@ -33,6 +33,12 @@ Create a KIND cluster using a custom configuration file to enable OIDC authentic
 kind create cluster --config myconfig.yaml
 ```
 
+Create a simple NGINX pod to test the configuration.
+
+```bash
+kubectl run mynginx --image=nginx
+```
+
 ## Create a RoleBinding
 
 Create a ClusterRoleBinding to bind the `cluster-admin` role to the new group that created was created Microsoft Entra via Terraform.
@@ -42,46 +48,141 @@ kubectl apply -f - <<EOF
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: oidc-cluster-admin
+  name: azure-cluster-admin
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 subjects:
 - kind: Group
-  name: $(terraform output -raw group_id)
+  name: $(terraform output -raw microsoft_group_id)
 EOF
 ```
 
-## Create OIDC user
+## Create Azure user
 
-Create a new user in the kubeconfig file using the `oidc-login` plugin. This will force the user to authenticate using Microsoft Entra.
+Create a new Azure user in the kubeconfig file using the `oidc-login` plugin. This will force the user to authenticate using Microsoft Entra.
 
 ```bash
-kubectl config set-credentials oidc-user \
+kubectl config set-credentials azure-user \
   --exec-api-version=client.authentication.k8s.io/v1 \
   --exec-interactive-mode=Never \
   --exec-command=kubectl \
   --exec-arg=oidc-login \
   --exec-arg=get-token \
-  --exec-arg="--oidc-issuer-url=https://login.microsoftonline.com/$(terraform output -raw tenant_id)/v2.0" \
-  --exec-arg="--oidc-client-id=$(terraform output -raw client_id)"
-```
-
-## Set the context
-
-Set the current context to use the OIDC user.
-
-```bash
-kubectl config set-context --current --user=oidc-user
+  --exec-arg=--oidc-issuer-url=$(terraform output -raw microsoft_issuer_url) \
+  --exec-arg=--oidc-client-id=$(terraform output -raw microsoft_client_id) \
+  --exec-arg=--oidc-extra-scope="email offline_access profile openid"
 ```
 
 ## Test the configuration
 
-Run the following command to test the configuration. This command should return the nodes in the Kubernetes cluster after authenticating with Microsoft Entra.
+Run the following commands to test the configuration. These commands should return the pods and nodes in the Kubernetes cluster after authenticating with Microsoft Entra.
 
 ```bash
-kubectl get nodes
+kubectl get pods --user=azure-user
+kubectl get nodes --user=azure-user
+```
+
+You should be presented with a login prompt to authenticate with Microsoft Entra. After successful authentication, you should see the nodes in the Kubernetes cluster.
+
+## Add another JWT provider
+
+Run the following command to append another JWT provider to the structured authentication configuration file.
+
+```bash
+cat <<EOF >> structured-auth.yaml
+- issuer:
+    url: $(terraform output -raw okta_issuer_url)
+    audiences:
+    - $(terraform output -raw okta_client_id)
+  claimMappings:
+    username:
+      claim: "email"
+      prefix: ""
+    groups:
+      claim: "groups"
+      prefix: ""
+EOF
+```
+
+## Create a Role and RoleBinding for the new user and group
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-svc-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "watch", "list"]
+EOF
+
+kubectl apply -f - <<EOF
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: okta-pod-svc-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pod-svc-reader
+subjects:
+- kind: Group
+  name: $(terraform output -raw okta_group_name)
+EOF
+```
+
+## Create a new Okta user
+
+```bash
+kubectl config set-credentials okta-user \
+--exec-api-version=client.authentication.k8s.io/v1beta1 \
+--exec-command=kubectl \
+--exec-arg=oidc-login \
+--exec-arg=get-token \
+--exec-arg=--oidc-issuer-url=$(terraform output -raw okta_issuer_url) \
+--exec-arg=--oidc-client-id=$(terraform output -raw okta_client_id) \
+--exec-arg=--oidc-extra-scope="email offline_access profile openid"
+```
+
+## Test the new configuration
+
+Run the following command to test the new configuration. This command should return the pods in the Kubernetes cluster after authenticating with Okta.
+
+```bash
+kubectl get pods --user=okta-user
+```
+
+Now run the following command. This command should return a forbidden error because the user does not have permission to list the nodes in the Kubernetes cluster.
+
+```bash
+kubectl get nodes --user=okta-user
+```
+
+## CEL expression for claim validation
+
+Open the structured-auth.yaml file and add this to the Microsoft issuer configuration.
+
+```yaml
+claimValidationRules:
+  - expression: "claims.name.startsWith('Bob')"
+    message: only people named Bob are allowed
+```
+
+Clear the oidc-login cache.
+
+```bash
+kubectl oidc-login clean
+```
+
+Run the following command to test the claim validation.
+
+```bash
+kubectl get pods --user=azure-user
 ```
 
 ## Clean up
@@ -90,7 +191,8 @@ When you are done testing, run the following commands to clean up the resources.
 
 ```bash
 kind delete cluster
-kubectl config delete-user oidc
+kubectl config delete-user azure-user
+kubectl config delete-user okta-user
 kubectl oidc-login clean
 terraform destroy
 ```
@@ -106,11 +208,17 @@ docker logs -f kind-control-plane
 Check to ensure the authentication configuration file was mounted correctly.
 
 ```bash
-docker exec -it kind-control-plane cat /mnt/configs/auth.yaml
+docker exec -it kind-control-plane cat /etc/kubernetes/structured-auth.yaml
 ```
 
 Check kube-apiserver logs for any errors related to OIDC authentication.
 
 ```bash
-docker exec -it kind-control-plane cat /var/log/containers/kube-apiserver-kind-control-plane_kube-system_kube-apiserver-*.log
+docker exec -it kind-control-plane sh
+```
+
+Run the following command inside the container.
+
+```bash
+cat /var/log/containers/kube-apiserver-kind-control-plane_kube-system_kube-apiserver-*.log
 ```

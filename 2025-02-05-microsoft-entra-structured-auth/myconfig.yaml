@@ -1,18 +1,17 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
-- role: control-plane
-  extraMounts:
-    - hostPath: ./structured-auth.yaml
-      containerPath: /etc/kubernetes/structured-auth.yaml
-  kubeadmConfigPatches:
-  - |
-    kind: ClusterConfiguration
-    apiServer:
-        extraArgs:
-          authentication-config: /etc/kubernetes/structured-auth.yaml
-        extraVolumes:
-        - name: structured-auth
-          hostPath: /etc/kubernetes/structured-auth.yaml
-          mountPath: /etc/kubernetes/structured-auth.yaml
-          readOnly: true
+  - role: control-plane
+    extraMounts:
+      - hostPath: ./structured-auth.yaml
+        containerPath: /etc/kubernetes/structured-auth.yaml
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+            extraArgs:
+              authentication-config: /etc/kubernetes/structured-auth.yaml
+            extraVolumes:
+            - name: structured-auth
+              hostPath: /etc/kubernetes/structured-auth.yaml
+              mountPath: /etc/kubernetes/structured-auth.yaml

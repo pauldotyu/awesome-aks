@@ -1,26 +1,7 @@
-terraform {
-  required_providers {
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 3.1.0"
-    }
-
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.5.2"
-    }
-
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6.3"
-    }
-  }
-}
-
 data "azuread_client_config" "current" {}
 
 resource "azuread_group" "example" {
-  display_name     = "K8s Cluster Admins"
+  display_name     = "k8s-admins"
   security_enabled = true
 }
 
@@ -29,13 +10,8 @@ resource "azuread_group_member" "example" {
   member_object_id = data.azuread_client_config.current.object_id
 }
 
-resource "random_integer" "example" {
-  min = 10
-  max = 99
-}
-
 resource "azuread_application" "example" {
-  display_name                   = "example${random_integer.example.result}"
+  display_name                   = "k8s-oidc"
   owners                         = [data.azuread_client_config.current.object_id]
   group_membership_claims        = ["SecurityGroup"]
   fallback_public_client_enabled = true
@@ -44,8 +20,13 @@ resource "azuread_application" "example" {
     access_token {
       name = "groups"
     }
+
     id_token {
-      name = "email"
+      name = "groups"
+    }
+
+    saml2_token {
+      name = "groups"
     }
   }
 
@@ -71,26 +52,4 @@ resource "azuread_application" "example" {
       type = "Scope"
     }
   }
-}
-
-resource "local_file" "kind_config" {
-  filename = "myconfig.yaml"
-  content = templatefile("myconfig.tmpl",
-    {
-      TENANT_ID = data.azuread_client_config.current.tenant_id
-      CLIENT_ID = azuread_application.example.client_id
-    }
-  )
-}
-
-output "tenant_id" {
-  value = data.azuread_client_config.current.tenant_id
-}
-
-output "client_id" {
-  value = azuread_application.example.client_id
-}
-
-output "group_id" {
-  value = azuread_group.example.object_id
 }
