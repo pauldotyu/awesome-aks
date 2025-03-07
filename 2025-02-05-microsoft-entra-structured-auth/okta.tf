@@ -86,3 +86,12 @@ resource "okta_auth_server_policy_rule" "example" {
   scope_whitelist = ["*"]
   group_whitelist = ["EVERYONE"]
 }
+
+resource "local_file" "okta_reader_rolebinding" {
+  filename = "./okta-reader-rolebinding.yaml"
+  content = templatefile("okta-reader-rolebinding.tmpl",
+    {
+      GROUP_NAME = okta_group.example.name
+    }
+  )
+}

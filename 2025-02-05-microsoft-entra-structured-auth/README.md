@@ -30,13 +30,13 @@ terraform apply
 Create a KIND cluster using a custom configuration file to enable OIDC authentication.
 
 ```bash
-kind create cluster --config myconfig.yaml
+kind create cluster --config kindconfig1.yaml
 ```
 
-Create a simple NGINX pod to test the configuration.
+Create a pod to test the configuration.
 
 ```bash
-kubectl run mynginx --image=nginx
+kubectl run mybusybox --image=busybox --restart=Never --command -- sleep 3600
 ```
 
 ## Create a RoleBinding
@@ -114,7 +114,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: default
-  name: pod-svc-reader
+  name: po-svc-reader
 rules:
 - apiGroups: [""]
   resources: ["pods", "services"]
@@ -125,11 +125,11 @@ kubectl apply -f - <<EOF
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: okta-pod-svc-reader
+  name: okta-po-svc-reader
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: pod-svc-reader
+  name: po-svc-reader
 subjects:
 - kind: Group
   name: $(terraform output -raw okta_group_name)
@@ -214,11 +214,5 @@ docker exec -it kind-control-plane cat /etc/kubernetes/structured-auth.yaml
 Check kube-apiserver logs for any errors related to OIDC authentication.
 
 ```bash
-docker exec -it kind-control-plane sh
-```
-
-Run the following command inside the container.
-
-```bash
-cat /var/log/containers/kube-apiserver-kind-control-plane_kube-system_kube-apiserver-*.log
+docker exec -it kind-control-plane sh -c "cat /var/log/containers/kube-apiserver-kind-control-plane_kube-system_kube-apiserver-*.log"
 ```

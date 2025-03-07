@@ -2,7 +2,7 @@ apiVersion: apiserver.config.k8s.io/v1beta1
 kind: AuthenticationConfiguration
 jwt:
   - issuer:
-      url: ${ISSUER_URL}
+      url: https://login.microsoftonline.com/${TENANT_ID}/v2.0
       audiences:
         - ${CLIENT_ID}
     claimMappings:
