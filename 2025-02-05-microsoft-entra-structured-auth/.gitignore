@@ -1,1 +1,4 @@
 structured-auth.yaml
+azure-cluster-admin-rolebinding.yaml
+kindconfig1.yaml
+okta-reader-rolebinding.yaml
