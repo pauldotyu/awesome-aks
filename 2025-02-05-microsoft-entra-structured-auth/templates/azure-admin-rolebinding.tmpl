@@ -1,11 +1,11 @@
-kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
 metadata:
-  name: okta-po-svc-reader
+  name: azure-admin
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: po-svc-reader
+  kind: ClusterRole
+  name: cluster-admin
 subjects:
 - kind: Group
-  name: ${GROUP_NAME}
+  name: ${GROUP_ID}

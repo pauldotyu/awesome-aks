@@ -88,8 +88,8 @@ resource "okta_auth_server_policy_rule" "example" {
 }
 
 resource "local_file" "okta_reader_rolebinding" {
-  filename = "./okta-reader-rolebinding.yaml"
-  content = templatefile("okta-reader-rolebinding.tmpl",
+  filename = "manifests/okta-reader-rolebinding.yaml"
+  content = templatefile("templates/okta-reader-rolebinding.tmpl",
     {
       GROUP_NAME = okta_group.example.name
     }

@@ -53,3 +53,32 @@ resource "azuread_application" "example" {
     }
   }
 }
+
+resource "local_file" "kind_config" {
+  filename = "manifests/kindconfig1.yaml"
+  content = templatefile("templates/kindconfig1.tmpl",
+    {
+      TENANT_ID = data.azuread_client_config.current.tenant_id
+      CLIENT_ID = azuread_application.example.client_id
+    }
+  )
+}
+
+resource "local_file" "auth_config" {
+  filename = "manifests/structured-auth.yaml"
+  content = templatefile("templates/structured-auth.tmpl",
+    {
+      TENANT_ID = data.azuread_client_config.current.tenant_id
+      CLIENT_ID = azuread_application.example.client_id
+    }
+  )
+}
+
+resource "local_file" "azure_cluster_admin_rolebinding" {
+  filename = "manifests/azure-admin-rolebinding.yaml"
+  content = templatefile("templates/azure-admin-rolebinding.tmpl",
+    {
+      GROUP_ID = azuread_group.example.object_id
+    }
+  )
+}

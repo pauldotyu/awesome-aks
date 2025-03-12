@@ -1,7 +1,9 @@
 #! /bin/bash
 
+cd ../
 kind delete cluster
 kubectl config delete-user azure-user
 kubectl config delete-user okta-user
 kubectl oidc-login clean
 terraform apply --auto-approve
+cd -

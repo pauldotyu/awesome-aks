@@ -2,6 +2,8 @@
 
 This demo walks you through the steps to configure Microsoft Entra ID as an OIDC provider for Kubernetes using a structured authentication configuration file. The demo uses Terraform to create an application registration in Microsoft Entra ID, KIND to create a Kubernetes cluster, and kubectl to configure the OIDC user.
 
+Presented at the SCaLE 22X conference on March 7, 2025 in a session titled "[JWT it like it's hot!!](https://www.socallinuxexpo.org/scale/22x/presentations/jwt-it-its-hot)"
+
 ## Prerequisites
 
 - [Microsoft Entra](https://learn.microsoft.com/entra/fundamentals/what-is-entra) account with permissions to create an application registration, group, and assign users to the group.
@@ -11,7 +13,23 @@ This demo walks you through the steps to configure Microsoft Entra ID as an OIDC
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 - [krew](https://krew.sigs.k8s.io/docs/user-guide/quickstart/) to install [kubelogin also known as oidc-login](https://github.com/int128/kubelogin?tab=readme-ov-file#setup)
 
-## Create an application registration in Microsoft Entra ID
+
+## Run the demo automatically
+
+To run this demo automatically, change to the `demo` directory and run the `make` commands to set up, run, reset, and clean up the demo. The demo script will step through the process of creating the resources, configuring the Kubernetes cluster, and testing the configuration.
+
+```text
+make setup        # this will run the terraform apply
+make run          # this will run the demo, simply press enter to step through the demo
+make reset        # this will reset the demo to the beginning where you can run `make run` again
+make cleanup      # this will delete the kind cluster, run the terraform destroy, and delete the kubeconfig users
+```
+
+## Run the demo manually
+
+Step through the following sections to run the demo manually.
+
+### Create an application registration in Microsoft Entra ID
 
 Run the following command to initialize the Terraform providers.
 
@@ -25,12 +43,12 @@ Create Microsoft Entra resources using Terraform.
 terraform apply
 ```
 
-## Create KIND cluster
+### Create KIND cluster
 
 Create a KIND cluster using a custom configuration file to enable OIDC authentication.
 
 ```bash
-kind create cluster --config kindconfig1.yaml
+kind create cluster --config manifests/kindconfig1.yaml
 ```
 
 Create a pod to test the configuration.
@@ -39,16 +57,16 @@ Create a pod to test the configuration.
 kubectl run mybusybox --image=busybox --restart=Never --command -- sleep 3600
 ```
 
-## Create a RoleBinding
+### Create a RoleBinding
 
 Create a ClusterRoleBinding to bind the `cluster-admin` role to the new group that created was created Microsoft Entra via Terraform.
 
 ```bash
 kubectl apply -f - <<EOF
-kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
 metadata:
-  name: azure-cluster-admin
+  name: azure-admin
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -59,7 +77,7 @@ subjects:
 EOF
 ```
 
-## Create Azure user
+### Create Azure user
 
 Create a new Azure user in the kubeconfig file using the `oidc-login` plugin. This will force the user to authenticate using Microsoft Entra.
 
@@ -75,7 +93,7 @@ kubectl config set-credentials azure-user \
   --exec-arg=--oidc-extra-scope="email offline_access profile openid"
 ```
 
-## Test the configuration
+### Test the configuration
 
 Run the following commands to test the configuration. These commands should return the pods and nodes in the Kubernetes cluster after authenticating with Microsoft Entra.
 
@@ -86,12 +104,12 @@ kubectl get nodes --user=azure-user
 
 You should be presented with a login prompt to authenticate with Microsoft Entra. After successful authentication, you should see the nodes in the Kubernetes cluster.
 
-## Add another JWT provider
+### Add another JWT provider
 
 Run the following command to append another JWT provider to the structured authentication configuration file.
 
 ```bash
-cat <<EOF >> structured-auth.yaml
+cat <<EOF >> manifests/structured-auth.yaml
 - issuer:
     url: $(terraform output -raw okta_issuer_url)
     audiences:
@@ -106,7 +124,7 @@ cat <<EOF >> structured-auth.yaml
 EOF
 ```
 
-## Create a Role and RoleBinding for the new user and group
+### Create a Role and RoleBinding for the new user and group
 
 ```bash
 kubectl apply -f - <<EOF
@@ -119,11 +137,9 @@ rules:
 - apiGroups: [""]
   resources: ["pods", "services"]
   verbs: ["get", "watch", "list"]
-EOF
-
-kubectl apply -f - <<EOF
-kind: RoleBinding
+---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
   name: okta-po-svc-reader
 roleRef:
@@ -136,7 +152,7 @@ subjects:
 EOF
 ```
 
-## Create a new Okta user
+### Create a new Okta user
 
 ```bash
 kubectl config set-credentials okta-user \
@@ -149,7 +165,7 @@ kubectl config set-credentials okta-user \
 --exec-arg=--oidc-extra-scope="email offline_access profile openid"
 ```
 
-## Test the new configuration
+### Test the new configuration
 
 Run the following command to test the new configuration. This command should return the pods in the Kubernetes cluster after authenticating with Okta.
 
@@ -163,7 +179,7 @@ Now run the following command. This command should return a forbidden error beca
 kubectl get nodes --user=okta-user
 ```
 
-## CEL expression for claim validation
+### CEL expression for claim validation
 
 Open the structured-auth.yaml file and add this to the Microsoft issuer configuration.
 
@@ -172,6 +188,9 @@ claimValidationRules:
   - expression: "claims.name.startsWith('Bob')"
     message: only people named Bob are allowed
 ```
+
+> [!IMPORTANT]  
+> Use an editor that will edit the file in place like nano or vim with the `set backupcopy=yes` option set in .vimrc. If you use an editor that creates a backup file and a new file with the changes, the changes will not be applied to the file mounted in the KIND cluster Pod because Docker volume mounts uses inode consistency. 
 
 Clear the oidc-login cache.
 
@@ -185,7 +204,7 @@ Run the following command to test the claim validation.
 kubectl get pods --user=azure-user
 ```
 
-## Clean up
+### Clean up
 
 When you are done testing, run the following commands to clean up the resources.
 

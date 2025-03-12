@@ -1,6 +1,7 @@
 variable "okta_base_url" {
   type        = string
-  description = "okta.com"
+  description = "your okta base url"
+  default     = "okta.com"
 }
 
 variable "okta_org_name" {

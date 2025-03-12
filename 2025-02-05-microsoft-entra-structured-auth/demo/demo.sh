@@ -12,6 +12,7 @@ DEMO_PROMPT="${GREEN}➜ ${CYAN}\W ${COLOR_RESET}"
 clear
 
 TYPE_SPEED=40
+cd ../
 
 p "# get tenant id"
 pei "MSFT_TENANT_ID=\$(terraform output -raw microsoft_tenant_id)"
@@ -41,10 +42,10 @@ p "curl -X POST https://login.microsoftonline.com/\$MSFT_TENANT_ID/oauth2/v2.0/t
 curl -X POST https://login.microsoftonline.com/$MSFT_TENANT_ID/oauth2/v2.0/token -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=device_code&client_id=${MSFT_CLIENT_ID}&device_code=${DEVICE_CODE}" | jq
 
 p "# view kind config"
-pei "less kindconfig1.yaml"
+pei "less manifests/kindconfig1.yaml"
 
 p "# create a new kind cluster"
-pei "kind create cluster --config kindconfig1.yaml"
+pei "kind create cluster --config manifests/kindconfig1.yaml"
 
 p "# add azure user entry in kubeconfig"
 p "kubectl config set-credentials azure-user \\
@@ -62,8 +63,8 @@ p "# deploy a pod"
 pei "kubectl run mybusybox --user=azure-user --image=busybox --restart=Never --command -- sleep 3600"
 
 p "# create cluster role binding for the group"
-pei "less azure-cluster-admin-rolebinding.yaml"
-pe "kubectl apply -f azure-cluster-admin-rolebinding.yaml"
+pei "less manifests/azure-admin-rolebinding.yaml"
+pe "kubectl apply -f manifests/azure-admin-rolebinding.yaml"
 
 p "# deploy a pod"
 pei "kubectl run mybusybox --user=azure-user --image=busybox --restart=Never --command -- sleep 3600"
@@ -74,16 +75,16 @@ pei "kubectl config delete-user azure-user"
 pei "kubectl oidc-login clean"
 
 p "# view structured auth config"
-pei "less structured-auth.yaml"
+pei "less manifests/structured-auth.yaml"
 
 p "# view new kind config"
-pei "less kindconfig2.yaml"
+pei "less manifests/kindconfig2.yaml"
 
 p "# create a new kind cluster"
-pei "kind create cluster --config kindconfig2.yaml"
+pei "kind create cluster --config manifests/kindconfig2.yaml"
 
 p "# create cluster role binding for the group"
-pei "kubectl apply -f azure-cluster-admin-rolebinding.yaml"
+pei "kubectl apply -f manifests/azure-admin-rolebinding.yaml"
 
 p "# add azure user entry in kubeconfig"
 p "kubectl config set-credentials azure-user \\
@@ -107,7 +108,7 @@ p "# get okta client id"
 pei "OKTA_CLIENT_ID=\$(terraform output -raw okta_client_id)"
 
 p "# drop in a new jwt provider"
-p "cat <<EOF >> structured-auth.yaml
+p "cat <<EOF >> manifests/structured-auth.yaml
   - issuer:
       url: \$OKTA_ISSUER_URL
       audiences:
@@ -120,7 +121,7 @@ p "cat <<EOF >> structured-auth.yaml
         claim: "groups"
         prefix: ""
 EOF"
-cat <<EOF >> structured-auth.yaml
+cat <<EOF >> manifests/structured-auth.yaml
   - issuer:
       url: $OKTA_ISSUER_URL
       audiences:
@@ -141,12 +142,12 @@ p "# check the kube-apiserver logs"
 pe "docker exec -it kind-control-plane sh -c \"cat /var/log/containers/kube-apiserver-kind-control-plane_kube-system_kube-apiserver-*.log\""
 
 p "# deploy reader role for okta user"
-pei "less okta-reader-role.yaml"
-pe "kubectl apply -f okta-reader-role.yaml"
+pei "less manifests/okta-reader-role.yaml"
+pe "kubectl apply -f manifests/okta-reader-role.yaml"
 
 p "# deploy reader role binding for okta user"
-pei "less okta-reader-rolebinding.yaml"
-pe "kubectl apply -f okta-reader-rolebinding.yaml"
+pei "less manifests/okta-reader-rolebinding.yaml"
+pe "kubectl apply -f manifests/okta-reader-rolebinding.yaml"
 
 p "# add okta user entry in kubeconfig"
 p "kubectl config set-credentials okta-user \\
@@ -164,12 +165,12 @@ pei "kubectl get pods --user=okta-user"
 pe "kubectl get nodes --user=okta-user"
 
 p "# add claim validation rule"
-p "cat <<EOF >> structured-auth.yaml
+p "cat <<EOF >> manifests/structured-auth.yaml
     claimValidationRules:
       - expression: \"claims.name.startsWith('Bob')\"
         message: only people named Bob are allowed
 EOF"
-cat <<EOF >> structured-auth.yaml
+cat <<EOF >> manifests/structured-auth.yaml
     claimValidationRules:
       - expression: "claims.name.startsWith('Bob')"
         message: only people named Bob are allowed
@@ -186,7 +187,7 @@ p "# test again as okta user"
 pei "kubectl get pods --user=okta-user"
 
 p "# edit validation rule"
-pei "vim structured-auth.yaml"
+pei "nano manifests/structured-auth.yaml"
 
 p "# check the structured auth config"
 pe "docker exec -it kind-control-plane cat /etc/kubernetes/structured-auth.yaml"
@@ -199,4 +200,6 @@ p "# test again as okta-user"
 pei "kubectl get pods --user=okta-user"
 
 p "exit"
+
+cd -
 clear
