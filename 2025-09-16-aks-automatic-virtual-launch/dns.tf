@@ -10,4 +10,7 @@ resource "azapi_resource" "dns" {
       zoneType = "Public"
     }
   }
+  response_export_values = [
+    "properties"
+  ]
 }

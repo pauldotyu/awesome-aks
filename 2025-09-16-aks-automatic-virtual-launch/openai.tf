@@ -39,3 +39,14 @@ resource "azapi_resource" "oai_gpt_5_mini" {
     }
   }
 }
+
+resource "azapi_resource" "oai_id" {
+  type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview"
+  name      = "id-${local.random_name}"
+  parent_id = azapi_resource.rg.id
+  location  = var.ai_location
+  tags      = var.tags
+  response_export_values = [
+    "properties"
+  ]
+}

@@ -30,3 +30,9 @@ variable "dns_zone_name" {
   type        = string
   default     = "example.com"
 }
+
+variable "alert_email" {
+  description = "The email address to send alerts to."
+  type        = string
+  default     = "admin@example.com"
+}
