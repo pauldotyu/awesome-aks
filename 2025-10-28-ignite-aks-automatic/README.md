@@ -1,6 +1,6 @@
 # Microsoft Ignite Demo: AKS Automatic with Terraform
 
-Work in progress.
+Work in progress...
 
 This is a guide to create an AKS Automatic cluster with Terraform including full cluster onboarding for monitoring.
 

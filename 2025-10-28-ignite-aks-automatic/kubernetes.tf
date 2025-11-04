@@ -1,6 +1,6 @@
 // https://learn.microsoft.com/azure/templates/microsoft.containerservice/managedclusters?pivots=deployment-language-terraform
 resource "azapi_resource" "aks" {
-  type      = "Microsoft.ContainerService/managedClusters@2025-08-02-preview"
+  type      = "Microsoft.ContainerService/managedClusters@2025-09-02-preview"
   parent_id = azapi_resource.rg.id
   location  = azapi_resource.rg.location
   tags      = var.tags
@@ -54,9 +54,9 @@ resource "azapi_resource" "aks" {
           }
         }
       }
-      hostedSystemProfile = {
-        enabled = true
-      }
+      # hostedSystemProfile = {
+      #   enabled = true
+      # }
       ingressProfile = {
         gatewayAPI = {
           installation = "Standard"
