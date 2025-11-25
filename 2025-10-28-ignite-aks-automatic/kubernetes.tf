@@ -57,27 +57,27 @@ resource "azapi_resource" "aks" {
       # hostedSystemProfile = {
       #   enabled = true
       # }
-      ingressProfile = {
-        gatewayAPI = {
-          installation = "Standard"
-        }
-      }
-      serviceMeshProfile = {
-        istio = {
-          components = {
-            ingressGateways = [
-              {
-                enabled = true
-                mode = "External"
-              }
-            ]
-          }
-          revisions = [
-            "asm-1-26"
-          ]
-        }
-        mode = "Istio"
-      }
+      # ingressProfile = {
+      #   gatewayAPI = {
+      #     installation = "Standard"
+      #   }
+      # }
+      # serviceMeshProfile = {
+      #   istio = {
+      #     components = {
+      #       ingressGateways = [
+      #         {
+      #           enabled = true
+      #           mode = "External"
+      #         }
+      #       ]
+      #     }
+      #     revisions = [
+      #       "asm-1-26"
+      #     ]
+      #   }
+      #   mode = "Istio"
+      # }
     }
     sku = {
       name = "Automatic"
