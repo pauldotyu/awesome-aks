@@ -71,6 +71,7 @@ global:
   domain: argocd.example.com
 configs:
   cm:
+    admin.enabled: false
     oidc.config: |
       name: Microsoft Entra ID
       issuer: https://login.microsoftonline.com/$TENANT_ID/v2.0

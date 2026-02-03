@@ -104,6 +104,7 @@ global:
   domain: argocd.${azurerm_dns_zone.example.name}
 configs:
   cm:
+    admin.enabled: false
     oidc.config: |
       name: Microsoft Entra ID
       issuer: https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0
