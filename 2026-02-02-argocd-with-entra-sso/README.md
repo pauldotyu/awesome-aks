@@ -86,15 +86,9 @@ configs:
         - openid
         - profile
         - email
-    rbac:
-      policy.csv: |
-        p, role:org-admin, applications, *, */*, allow
-        p, role:org-admin, clusters, get, *, allow
-        p, role:org-admin, repositories, get, *, allow
-        p, role:org-admin, repositories, create, *, allow
-        p, role:org-admin, repositories, update, *, allow
-        p, role:org-admin, repositories, delete, *, allow
-        g, "$ADMIN_GROUP_OBJECT_ID", role:org-admin
+  rbac:
+    policy.csv: |
+      g, "$ADMIN_GROUP_OBJECT_ID", role:admin
 server:
   podLabels:
     azure.workload.identity/use: "true"

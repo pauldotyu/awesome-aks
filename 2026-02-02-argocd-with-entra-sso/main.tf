@@ -91,13 +91,11 @@ resource "azuread_application" "example" {
     access_token {
       name                  = "groups"
       essential             = true
-      additional_properties = ["emit_as_roles"]
     }
 
     id_token {
       name                  = "groups"
       essential             = true
-      additional_properties = ["emit_as_roles"]
     }
   }
 }

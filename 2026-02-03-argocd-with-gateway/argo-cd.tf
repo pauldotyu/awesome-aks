@@ -56,13 +56,11 @@ resource "azuread_application" "example" {
     access_token {
       name                  = "groups"
       essential             = true
-      additional_properties = ["emit_as_roles"]
     }
 
     id_token {
       name                  = "groups"
       essential             = true
-      additional_properties = ["emit_as_roles"]
     }
   }
 }
@@ -114,20 +112,13 @@ configs:
       requestedIDTokenClaims:
         groups:
           essential: true
-          value: "ApplicationGroup"
       requestedScopes:
         - openid
         - profile
         - email
-    rbac:
-      policy.csv: |
-        p, role:org-admin, applications, *, */*, allow
-        p, role:org-admin, clusters, get, *, allow
-        p, role:org-admin, repositories, get, *, allow
-        p, role:org-admin, repositories, create, *, allow
-        p, role:org-admin, repositories, update, *, allow
-        p, role:org-admin, repositories, delete, *, allow
-        g, "${data.azuread_client_config.current.object_id}", role:org-admin
+  rbac:
+    policy.csv: |
+      g, "${data.azuread_client_config.current.object_id}", role:admin
   params:
     server.insecure: "true"
 server:
