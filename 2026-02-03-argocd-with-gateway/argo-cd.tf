@@ -53,11 +53,6 @@ resource "azuread_application" "example" {
   }
 
   optional_claims {
-    access_token {
-      name                  = "groups"
-      essential             = true
-    }
-
     id_token {
       name                  = "groups"
       essential             = true
@@ -83,9 +78,13 @@ resource "azuread_service_principal_delegated_permission_grant" "example" {
   claim_values                         = ["openid", "profile", "email", "User.Read"]
 }
 
+data "azuread_group" "example" {
+  display_name = "CloudNative" # Replace with your actual group name
+}
+
 resource "azuread_app_role_assignment" "example" {
   app_role_id         = "00000000-0000-0000-0000-000000000000" # Default app role
-  principal_object_id = data.azuread_client_config.current.object_id
+  principal_object_id = data.azuread_group.example.object_id
   resource_object_id  = azuread_service_principal.example.object_id
 }
 
@@ -118,7 +117,7 @@ configs:
         - email
   rbac:
     policy.csv: |
-      g, "${data.azuread_client_config.current.object_id}", role:admin
+      g, "${data.azuread_group.example.object_id}", role:admin
   params:
     server.insecure: "true"
 server:

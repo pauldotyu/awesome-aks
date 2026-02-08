@@ -88,11 +88,6 @@ resource "azuread_application" "example" {
   }
 
   optional_claims {
-    access_token {
-      name                  = "groups"
-      essential             = true
-    }
-
     id_token {
       name                  = "groups"
       essential             = true
@@ -119,7 +114,7 @@ resource "azuread_service_principal_delegated_permission_grant" "example" {
 }
 
 data "azuread_group" "example" {
-  display_name = "CloudNative"
+  display_name = "CloudNative" # Replace with your actual group name
 }
 
 resource "azuread_app_role_assignment" "example" {
