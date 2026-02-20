@@ -238,6 +238,12 @@ kubectl get gateway -n argocd argocd-gateway -o wide
 kubectl get svc -n argocd
 ```
 
+To login to Argo CD CLI with SSO, use the following command:
+
+```bash
+argocd login argocd.$DNS_NAME --sso --grpc-web
+```
+
 ## Cleanup
 
 Delete Azure resources (this also removes the AKS cluster and all Kubernetes resources):

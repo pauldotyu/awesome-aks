@@ -11,10 +11,11 @@ locals {
 }
 
 resource "azuread_application" "example" {
-  display_name            = "app-argocd-${random_integer.example.result}"
-  owners                  = [data.azuread_client_config.current.object_id]
-  sign_in_audience        = "AzureADMyOrg"
-  group_membership_claims = ["ApplicationGroup"]
+  display_name                   = "app-argocd-${random_integer.example.result}"
+  owners                         = [data.azuread_client_config.current.object_id]
+  sign_in_audience               = "AzureADMyOrg"
+  group_membership_claims        = ["ApplicationGroup"]
+  fallback_public_client_enabled = true
 
   web {
     redirect_uris = [
@@ -54,8 +55,8 @@ resource "azuread_application" "example" {
 
   optional_claims {
     id_token {
-      name                  = "groups"
-      essential             = true
+      name      = "groups"
+      essential = true
     }
   }
 }
