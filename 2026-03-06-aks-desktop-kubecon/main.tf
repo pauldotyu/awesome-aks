@@ -124,8 +124,14 @@ resource "azapi_resource" "aks" {
   ]
 }
 
+resource "azurerm_role_assignment" "aks_admin" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  scope                = azapi_resource.aks.id
+}
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.containerservice/managedclusters/managednamespaces?pivots=deployment-language-terraform
-resource "azapi_resource" "project" {
+resource "azapi_resource" "managed_namespace" {
   type = "Microsoft.ContainerService/managedClusters/managedNamespaces@2026-01-02-preview"
   parent_id = azapi_resource.aks.id
   location = azurerm_resource_group.example.location
@@ -158,4 +164,10 @@ resource "azapi_resource" "project" {
       }
     }
   }
+}
+
+resource "azurerm_role_assignment" "managed_namespace_contributor" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "Azure Kubernetes Service Namespace Contributor"
+  scope                = azapi_resource.managed_namespace.id
 }
