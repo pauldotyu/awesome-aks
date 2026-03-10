@@ -171,3 +171,9 @@ resource "azurerm_role_assignment" "managed_namespace_contributor" {
   role_definition_name = "Azure Kubernetes Service Namespace Contributor"
   scope                = azapi_resource.managed_namespace.id
 }
+
+resource "azurerm_role_assignment" "managed_namespace_user" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "Azure Kubernetes Service Namespace User"
+  scope                = azapi_resource.managed_namespace.id
+}
