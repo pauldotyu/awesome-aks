@@ -132,11 +132,11 @@ resource "azurerm_role_assignment" "aks_admin" {
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.containerservice/managedclusters/managednamespaces?pivots=deployment-language-terraform
 resource "azapi_resource" "managed_namespace" {
-  type = "Microsoft.ContainerService/managedClusters/managedNamespaces@2026-01-02-preview"
+  type      = "Microsoft.ContainerService/managedClusters/managedNamespaces@2026-01-02-preview"
   parent_id = azapi_resource.aks.id
-  location = azurerm_resource_group.example.location
-  tags = var.tags
-  name = "demo"
+  location  = azurerm_resource_group.example.location
+  tags      = var.tags
+  name      = "demo"
 
   // this required when azapi local schema check isn't aware of the latest api version
   schema_validation_enabled = false
@@ -149,13 +149,13 @@ resource "azapi_resource" "managed_namespace" {
         owner   = "team-demo"
       }
       defaultNetworkPolicy = {
-        egress = "AllowSameNamespace"
+        egress  = "AllowSameNamespace"
         ingress = "AllowSameNamespace"
       }
       defaultResourceQuota = {
-        cpuLimit = "500m"
-        cpuRequest = "100m"
-        memoryLimit = "128Mi"
+        cpuLimit      = "500m"
+        cpuRequest    = "100m"
+        memoryLimit   = "128Mi"
         memoryRequest = "64Mi"
       }
       deletePolicy = "Delete"
@@ -176,4 +176,48 @@ resource "azurerm_role_assignment" "managed_namespace_user" {
   principal_id         = data.azurerm_client_config.current.object_id
   role_definition_name = "Azure Kubernetes Service Namespace User"
   scope                = azapi_resource.managed_namespace.id
+}
+
+resource "azurerm_user_assigned_identity" "example" {
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  name                = "id-${local.random_name}"
+}
+
+resource "azurerm_cognitive_account" "example" {
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = azurerm_resource_group.example.location
+  name                  = "ai-${local.random_name}"
+  custom_subdomain_name = "ai-${local.random_name}"
+  kind                  = "AIServices"
+  sku_name              = "S0"
+  local_auth_enabled    = false
+}
+
+resource "azurerm_cognitive_deployment" "example" {
+  cognitive_account_id = azurerm_cognitive_account.example.id
+  name                 = "gpt-5-mini"
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-5-mini"
+    version = "2025-08-07"
+  }
+
+  sku {
+    name     = "GlobalStandard"
+    capacity = 250
+  }
+}
+
+resource "azurerm_role_assignment" "mi_user" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "Cognitive Services OpenAI User"
+  scope                = azurerm_cognitive_account.example.id
+}
+
+resource "azurerm_role_assignment" "me_user" {
+  principal_id         = azurerm_user_assigned_identity.example.principal_id
+  role_definition_name = "Cognitive Services OpenAI User"
+  scope                = azurerm_cognitive_account.example.id
 }
