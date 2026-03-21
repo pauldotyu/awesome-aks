@@ -136,7 +136,7 @@ resource "azapi_resource" "managed_namespace" {
   parent_id = azapi_resource.aks.id
   location  = azurerm_resource_group.example.location
   tags      = var.tags
-  name      = "demo"
+  name      = "ns687"
 
   // this required when azapi local schema check isn't aware of the latest api version
   schema_validation_enabled = false
@@ -153,10 +153,10 @@ resource "azapi_resource" "managed_namespace" {
         ingress = "AllowSameNamespace"
       }
       defaultResourceQuota = {
-        cpuLimit      = "500m"
-        cpuRequest    = "100m"
-        memoryLimit   = "128Mi"
-        memoryRequest = "64Mi"
+        cpuLimit      = "2000m"
+        cpuRequest    = "2000m"
+        memoryLimit   = "4096Mi"
+        memoryRequest = "4096Mi"
       }
       deletePolicy = "Delete"
       labels = {
@@ -181,42 +181,52 @@ resource "azurerm_role_assignment" "managed_namespace_user" {
 resource "azurerm_user_assigned_identity" "example" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  name                = "id-${local.random_name}"
+  name                = "mi-${local.random_name}"
+}
+
+resource "azurerm_federated_identity_credential" "example" {
+  resource_group_name = azurerm_resource_group.example.name
+  parent_id           = azurerm_user_assigned_identity.example.id
+  name                = "aks-agent"
+  issuer              = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
+  audience            = ["api://AzureADTokenExchange"]
+  subject             = "system:serviceaccount:aks-agent-system:aks-agent"
 }
 
 resource "azurerm_cognitive_account" "example" {
   resource_group_name   = azurerm_resource_group.example.name
   location              = azurerm_resource_group.example.location
-  name                  = "ai-${local.random_name}"
-  custom_subdomain_name = "ai-${local.random_name}"
+  name                  = "mf-${local.random_name}"
+  custom_subdomain_name = "mf-${local.random_name}"
   kind                  = "AIServices"
   sku_name              = "S0"
-  local_auth_enabled    = false
+  local_auth_enabled    = true
 }
 
 resource "azurerm_cognitive_deployment" "example" {
   cognitive_account_id = azurerm_cognitive_account.example.id
-  name                 = "gpt-5-mini"
+  name                 = "gpt-5.4-mini"
+  rai_policy_name      = "Microsoft.DefaultV2"
 
   model {
     format  = "OpenAI"
-    name    = "gpt-5-mini"
-    version = "2025-08-07"
+    name    = "gpt-5.4-mini"
+    version = "2026-03-17"
   }
 
   sku {
     name     = "GlobalStandard"
-    capacity = 250
+    capacity = 10000
   }
 }
 
-resource "azurerm_role_assignment" "mi_user" {
+resource "azurerm_role_assignment" "mi" {
   principal_id         = data.azurerm_client_config.current.object_id
   role_definition_name = "Cognitive Services OpenAI User"
   scope                = azurerm_cognitive_account.example.id
 }
 
-resource "azurerm_role_assignment" "me_user" {
+resource "azurerm_role_assignment" "me" {
   principal_id         = azurerm_user_assigned_identity.example.principal_id
   role_definition_name = "Cognitive Services OpenAI User"
   scope                = azurerm_cognitive_account.example.id
