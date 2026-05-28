@@ -14,7 +14,7 @@ resource "random_string" "example" {
 }
 
 locals {
-  random_name = "msbuildltg408${random_string.example.result}"
+  random_name = "buildltg408${random_string.example.result}"
 }
 
 resource "azurerm_resource_group" "example" {
