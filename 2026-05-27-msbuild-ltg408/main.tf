@@ -160,8 +160,8 @@ resource "azapi_resource" "managed_namespace" {
         owner   = "team-blue"
       }
       defaultNetworkPolicy = {
-        egress  = "AllowSameNamespace"
-        ingress = "AllowSameNamespace"
+        egress  = "AllowAll"
+        ingress = "AllowAll"
       }
       defaultResourceQuota = {
         cpuLimit      = "2000m"
@@ -171,7 +171,10 @@ resource "azapi_resource" "managed_namespace" {
       }
       deletePolicy = "Delete"
       labels = {
-        app = "demo"
+        "headlamp.dev/project-id"            = "team-blue"
+        "headlamp.dev/project-managed-by"    = "aks-desktop"
+        "aks-desktop/project-subscription"   = data.azurerm_client_config.current.subscription_id
+        "aks-desktop/project-resource-group" = azurerm_resource_group.example.name
       }
     }
   }
@@ -195,13 +198,18 @@ resource "azurerm_user_assigned_identity" "example" {
   name                = "mi-${local.random_name}"
 }
 
-resource "azurerm_federated_identity_credential" "example" {
-  resource_group_name = azurerm_resource_group.example.name
-  parent_id           = azurerm_user_assigned_identity.example.id
+resource "azurerm_federated_identity_credential" "aks-agent" {
   name                = "aks-agent"
   issuer              = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
   audience            = ["api://AzureADTokenExchange"]
-  subject             = "system:serviceaccount:aks-agent-system:aks-agent"
+  subject             = "system:serviceaccount:aks-agent-system:aks-agent-sa"
+}
+
+resource "azurerm_federated_identity_credential" "contoso-air" {
+  name                = "contoso-air"
+  issuer              = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
+  audience            = ["api://AzureADTokenExchange"]
+  subject             = "system:serviceaccount:team-blue:contoso-air-sa"
 }
 
 resource "azurerm_cognitive_account" "example" {
