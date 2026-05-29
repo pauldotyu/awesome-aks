@@ -199,17 +199,19 @@ resource "azurerm_user_assigned_identity" "example" {
 }
 
 resource "azurerm_federated_identity_credential" "aks-agent" {
-  name                = "aks-agent"
-  issuer              = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
-  audience            = ["api://AzureADTokenExchange"]
-  subject             = "system:serviceaccount:aks-agent-system:aks-agent-sa"
+  user_assigned_identity_id = azurerm_user_assigned_identity.example.id
+  name                      = "aks-agent"
+  issuer                    = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
+  audience                  = ["api://AzureADTokenExchange"]
+  subject                   = "system:serviceaccount:aks-agent-system:aks-agent-sa"
 }
 
 resource "azurerm_federated_identity_credential" "contoso-air" {
-  name                = "contoso-air"
-  issuer              = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
-  audience            = ["api://AzureADTokenExchange"]
-  subject             = "system:serviceaccount:team-blue:contoso-air-sa"
+  user_assigned_identity_id = azurerm_user_assigned_identity.example.id
+  name                      = "contoso-air"
+  issuer                    = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
+  audience                  = ["api://AzureADTokenExchange"]
+  subject                   = "system:serviceaccount:team-blue:contoso-air-sa"
 }
 
 resource "azurerm_cognitive_account" "example" {
