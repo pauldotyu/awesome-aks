@@ -16,7 +16,7 @@ resource "azuread_application" "example" {
 
   web {
     redirect_uris = [
-      "https://localhost:9000/auth/callback"
+      "https://localhost:8080/auth/callback"
     ]
   }
 

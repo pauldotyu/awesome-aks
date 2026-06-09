@@ -7,7 +7,7 @@ terraform init
 terraform apply
 az aks get-credentials --resource-group $(terraform output -raw rg_name) --name $(terraform output -raw aks_name)
 kubectl port-forward svc/argocd-server -n argocd 9000:443 &
-argocd login localhost:9000 --sso --insecure
+argocd login localhost:8080 --sso --insecure
 argocd account get-user-info
 ```
 

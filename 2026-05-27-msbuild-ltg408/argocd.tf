@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster_extension" "argocd" {
     "azure.workloadIdentity.clientId"               = azuread_application.example.client_id
     "azure.workloadIdentity.entraSSOClientId"       = azuread_application.example.client_id
     "redis-ha.enabled"                              = "false"
-    "global.domain"                                 = "localhost:9000"
+    "global.domain"                                 = "localhost:8080"
     "configs.cm.admin\\.enabled"                    = "false"
     "configs.cm.oidc\\.config"                      = local.oidc_config
     "configs.rbac.policy\\.csv"                     = local.policy_csv
