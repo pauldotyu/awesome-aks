@@ -1,0 +1,58 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=4.68.0"
+    }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = "=3.1.1"
+    }
+
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "=1.19.0"
+    }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "=3.8.1"
+    }
+
+    time = {
+      source  = "hashicorp/time"
+      version = "=0.13.1"
+    }
+  }
+}
+
+provider "azurerm" {
+  resource_provider_registrations = "none"
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+}
+
+provider "helm" {
+  kubernetes = {
+    host                   = azurerm_kubernetes_cluster.example.kube_config.0.host
+    username               = azurerm_kubernetes_cluster.example.kube_config.0.username
+    password               = azurerm_kubernetes_cluster.example.kube_config.0.password
+    client_certificate     = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)
+    client_key             = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_key)
+    cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
+  }
+}
+
+provider "kubectl" {
+  host                   = azurerm_kubernetes_cluster.example.kube_config.0.host
+  username               = azurerm_kubernetes_cluster.example.kube_config.0.username
+  password               = azurerm_kubernetes_cluster.example.kube_config.0.password
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
+  load_config_file       = false
+}
