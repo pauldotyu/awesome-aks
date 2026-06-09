@@ -1,0 +1,106 @@
+# Anyscale on Azure Quickstart
+
+Terraform implementation of the [Quickstart: Deploy Anyscale on Azure with Envoy Gateway](https://learn.microsoft.com/azure/anyscale-on-azure/quickstart-azure-cli-gateway-envoy) guide. This deploys a full Anyscale-on-AKS stack using the AzAPI provider to create the `Anyscale.Platform` resources.
+
+Terraform creates:
+
+- Resource group
+- AKS cluster with workload identity and OIDC issuer enabled
+- User-assigned managed identity with federated credential for the Anyscale operator
+- Azure Container Registry (Standard SKU)
+- Storage account with HNS enabled and a private blob container
+- NVIDIA GPU Operator (Helm)
+- Envoy Gateway with a `GatewayClass`, `Gateway`, and public `LoadBalancer`
+- Anyscale Cloud and Cloud Resource via AzAPI (`Anyscale.Platform/clouds`)
+- Role assignments: Storage Blob Data Owner, AcrPush, Container Registry Tasks Contributor
+
+A `sample-workload/` directory contains a Ray job manifest and Python script you can use to verify the deployment.
+
+## Prerequisites
+
+- Azure CLI authenticated to a subscription with the following Azure resource providers registered:
+  - Anyscale.Platform
+  - Microsoft.Authorization
+  - Microsoft.ContainerService
+  - Microsoft.ManagedIdentity
+  - Microsoft.Network
+  - Microsoft.Resources
+  - Microsoft.Storage
+
+> [!TIP]
+> The AzureRM Terraform provider will automatically register required resource providers during deployment. If your account lacks permission to register providers, register them manually with `az provider register --namespace <provider-name>` before running `terraform apply`.
+
+- Terraform installed
+- Anyscale CLI installed
+
+> [!CAUTION]
+Anyscale on Azure is currently in preview and available in select regions. See [supported regions](https://learn.microsoft.com/azure/anyscale-on-azure/supported-regions) for the latest list. Check the `location` variable in [variables.tf](./variables.tf) for the regions validated by this config.
+
+## Deploy
+
+Login to your Azure account and set the subscription you want to use.
+
+```bash
+az login
+az account set -s <subscription-id>
+```
+
+Export the subscription ID for Terraform to use.
+
+```bash
+export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+```
+
+Initialize Terraform and deploy.
+
+```bash
+terraform init
+terraform apply
+```
+
+Review the variables in [variables.tf](./variables.tf) before deploying. Key options:
+
+- `location` - Azure region (default: `westus3`)
+- `system_node_pool_vm_count` - Number of system pool nodes (default: `3`)
+- `system_node_pool_vm_size` - VM size for the system pool (default: `Standard_D4s_v5`)
+
+## Verify
+
+Log into the AKS cluster.
+
+```bash
+az aks get-credentials -g $(terraform output -raw rg_name) -n $(terraform output -raw aks_name)
+```
+
+Check that the Anyscale operator, Envoy Gateway, and GPU Operator pods are running.
+
+```bash
+kubectl get po -A
+```
+
+Install the [Anyscale CLI](https://docs.anyscale.com/reference/quickstart-cli) and log in.
+
+```bash
+export ANYSCALE_HOST=https://console.azure.anyscale.com
+anyscale login
+```
+
+Verify the cloud is registered and healthy.
+
+```bash
+anyscale cloud list
+anyscale cloud verify --id <cloud-id>
+```
+
+Submit the sample Ray job to confirm end-to-end. The `--cloud` flag takes the full Azure resource ID of the Anyscale cloud.
+
+```bash
+anyscale job submit -f sample-workload/job.yaml \
+  --cloud /subscriptions/<subscription-id>/resourcegroups/<rg-name>/providers/anyscale.platform/clouds/<cloud-name>
+```
+
+## Cleanup
+
+```bash
+terraform destroy
+```

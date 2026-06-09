@@ -1,0 +1,4 @@
+name: my-first-job
+working_dir: .
+entrypoint: python main.py
+max_retries: 1
