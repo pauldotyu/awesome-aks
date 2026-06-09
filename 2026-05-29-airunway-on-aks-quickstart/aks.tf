@@ -25,29 +25,31 @@ resource "azurerm_kubernetes_cluster" "example" {
   }
 }
 
-resource "azurerm_kubernetes_cluster_node_pool" "inference" {
-  name                        = "inference"
-  kubernetes_cluster_id       = azurerm_kubernetes_cluster.example.id
-  vm_size                     = "Standard_NC48ads_A100_v4"
-  node_count                  = 1
-  min_count                   = 1
-  max_count                   = 1
-  auto_scaling_enabled        = true
-  gpu_driver                  = "None"
-  vnet_subnet_id              = azurerm_subnet.aks_inference.id
-  temporary_name_for_rotation = "temp${random_integer.example.result}"
+# When you're ready to add the inference node pool, uncomment the following code and run `terraform apply` again.
+# Make sure to adjust the VM size and node count as needed for your workload.
+# resource "azurerm_kubernetes_cluster_node_pool" "inference" {
+#   name                        = "inference"
+#   kubernetes_cluster_id       = azurerm_kubernetes_cluster.example.id
+#   vm_size                     = "Standard_NC48ads_A100_v4"
+#   node_count                  = 1
+#   min_count                   = 1
+#   max_count                   = 1
+#   auto_scaling_enabled        = true
+#   gpu_driver                  = "None"
+#   vnet_subnet_id              = azurerm_subnet.aks_inference.id
+#   temporary_name_for_rotation = "temp${random_integer.example.result}"
 
-  upgrade_settings {
-    drain_timeout_in_minutes      = 0
-    max_surge                     = "10%"
-    node_soak_duration_in_minutes = 0
-  }
+#   upgrade_settings {
+#     drain_timeout_in_minutes      = 0
+#     max_surge                     = "10%"
+#     node_soak_duration_in_minutes = 0
+#   }
 
-  depends_on = [
-    azurerm_kubernetes_cluster.example,
-    helm_release.nvidia_gpu_operator,
-    helm_release.istio_base,
-    helm_release.istiod,
-    helm_release.argo_cd
-  ]
-}
+#   depends_on = [
+#     azurerm_kubernetes_cluster.example,
+#     helm_release.nvidia_gpu_operator,
+#     helm_release.istio_base,
+#     helm_release.istiod,
+#     helm_release.argo_cd
+#   ]
+# }
