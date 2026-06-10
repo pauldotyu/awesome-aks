@@ -64,12 +64,32 @@ Review the variables in [variables.tf](./variables.tf) before deploying. Key opt
 - `system_node_pool_vm_count` - Number of system pool nodes (default: `3`)
 - `system_node_pool_vm_size` - VM size for the system pool (default: `Standard_D4s_v5`)
 
+Get the outputs
+
+```bash
+read -r \
+  RG_NAME \
+  AKS_NAME \
+  ANYSCALE_CLIENT_ID \
+  ANYSCALE_CLOUD_NAME \
+  ANYSCALE_CLOUD_ID \
+  ANYSCALE_CLOUD_SSO_URL \
+  ANYSCALE_CLOUD_RESOURCE_ID <<< "$(terraform output -json | jq -r \
+    '[.rg_name.value,
+      .aks_name.value,
+      .anyscale_iam_client_id.value,
+      .anyscale_cloud_name.value,
+      .anyscale_cloud_id.value,
+      .anyscale_cloud_sso_url.value,
+      .anyscale_cloud_resource_id.value] | @tsv')"
+```
+
 ## Verify
 
 Log into the AKS cluster.
 
 ```bash
-az aks get-credentials -g $(terraform output -raw rg_name) -n $(terraform output -raw aks_name)
+az aks get-credentials -g $RG_NAME -n $AKS_NAME
 ```
 
 Check that the Anyscale operator, Envoy Gateway, and GPU Operator pods are running.
@@ -89,14 +109,14 @@ Verify the cloud is registered and healthy.
 
 ```bash
 anyscale cloud list
-anyscale cloud verify --id <cloud-id>
+anyscale cloud verify --id $ANYSCALE_CLOUD_ID
 ```
 
 Submit the sample Ray job to confirm end-to-end. The `--cloud` flag takes the full Azure resource ID of the Anyscale cloud.
 
 ```bash
-anyscale job submit -f sample-workload/job.yaml \
-  --cloud /subscriptions/<subscription-id>/resourcegroups/<rg-name>/providers/anyscale.platform/clouds/<cloud-name>
+cd sample-workload
+anyscale job submit -f job.yaml --cloud $ANYSCALE_CLOUD_NAME --wait
 ```
 
 ## Cleanup
