@@ -9,7 +9,8 @@ Terraform creates:
 - User-assigned managed identity with federated credential for the Anyscale operator
 - Azure Container Registry (Standard SKU)
 - Storage account with HNS enabled and a private blob container
-- Managed Istio with Gateway API support
+- Azure Monitor workspace, Log Analytics workspace, and Application Insights for telemetry
+- AKS Gateway API enabled with Istio app routing support
 - Anyscale Cloud and Cloud Resource via AzAPI (`Anyscale.Platform/clouds`)
 - Role assignments: Storage Blob Data Owner, AcrPush, Container Registry Tasks Contributor
 
@@ -95,9 +96,11 @@ Deploy the gateway
 kubectl apply -f anyscale-gateway.yaml
 ```
 
+The `anyscale-gateway.yaml` manifest is generated from [anyscale-gateway.tmpl](./anyscale-gateway.tmpl) by Terraform.
+
 ## Verify
 
-Check that the Anyscale operator, Envoy Gateway, and GPU Operator pods are running.
+Check that the Anyscale operator and gateway-related pods are running.
 
 ```bash
 kubectl get po -A
@@ -121,7 +124,7 @@ Submit the sample Ray job to confirm end-to-end. The `--cloud` flag takes the fu
 
 ```bash
 cd sample-workload
-anyscale job submit -f job.yaml --cloud $ANYSCALE_CLOUD_NAME --wait
+anyscale job submit -f job.yaml --cloud $ANYSCALE_CLOUD_RESOURCE_ID --wait
 ```
 
 ## Cleanup
