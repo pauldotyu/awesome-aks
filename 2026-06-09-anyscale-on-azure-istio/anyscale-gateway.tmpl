@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway
+  namespace: anyscale-operator
+spec:
+  gatewayClassName: approuting-istio
+  infrastructure:
+    annotations:
+      service.beta.kubernetes.io/azure-dns-label-name: ${ANYSCALE_CLOUD_RESOURCE_ID}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.i.azure.anyscaleuserdata.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: anyscale-${ANYSCALE_CLOUD_RESOURCE_ID}-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https-session
+      port: 443
+      protocol: HTTPS
+      hostname: "*.s.azure.anyscaleuserdata.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: anyscale-${ANYSCALE_CLOUD_RESOURCE_ID}-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
