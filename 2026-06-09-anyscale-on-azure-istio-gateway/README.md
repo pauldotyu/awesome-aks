@@ -1,6 +1,6 @@
-# Anyscale on AKS
+# Anyscale on AKS with Istio Ingress Gateway
 
-Terraform implementation of Anyscale on AKS. This deploys a full Anyscale-on-AKS stack using the AzAPI provider to create the `Anyscale.Platform` resources.
+Terraform implementation of Anyscale on AKS. This deploys a full Anyscale on Azure stack using the AzAPI provider to create the `Anyscale.Platform` resources.
 
 Terraform creates:
 
