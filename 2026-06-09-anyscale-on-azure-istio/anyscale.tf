@@ -18,7 +18,12 @@ resource "azapi_resource" "anyscale_cloud" {
   }
 
   response_export_values = [
-    "*"
+    "properties.ssoUrl",
+    "properties.cloudResourceId"
+  ]
+
+  depends_on = [
+    azapi_resource.aks
   ]
 }
 
@@ -46,7 +51,11 @@ resource "azapi_resource" "anyscale_cloud_resource" {
   }
 
   response_export_values = [
-    "*"
+    "properties.cloudResourceId"
+  ]
+
+  depends_on = [
+    azapi_resource.aks
   ]
 }
 

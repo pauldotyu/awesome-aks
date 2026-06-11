@@ -25,3 +25,15 @@ output "anyscale_cloud_sso_url" {
 output "anyscale_cloud_resource_id" {
   value = azapi_resource.anyscale_cloud_resource.output.properties.cloudResourceId
 }
+
+output "otlp_logs_endpoint" {
+  value = azapi_resource.otel.output.properties.OTLPLogsEndpoint
+}
+
+output "otlp_metrics_endpoint" {
+  value = azapi_resource.otel.output.properties.OTLPMetricsEndpoint
+}
+
+output "otlp_traces_endpoint" {
+  value = azapi_resource.otel.output.properties.OTLPTracesEndpoint
+}

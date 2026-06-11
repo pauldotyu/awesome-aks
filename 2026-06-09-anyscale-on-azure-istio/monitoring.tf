@@ -37,6 +37,8 @@ resource "azapi_resource" "otel" {
   }
 
   response_export_values = [
-    "*"
+    "properties.OTLPLogsEndpoint",
+    "properties.OTLPMetricsEndpoint",
+    "properties.OTLPTracesEndpoint"
   ]
 }

@@ -1,18 +1,19 @@
-# Anyscale on AKS Automatic
+# Anyscale on AKS
 
-Terraform implementation of Anyscale on AKS Automatic. This deploys a full Anyscale-on-AKS stack using the AzAPI provider to create the `Anyscale.Platform` resources.
+Terraform implementation of Anyscale on AKS. This deploys a full Anyscale-on-AKS stack using the AzAPI provider to create the `Anyscale.Platform` resources.
 
 Terraform creates:
 
 - Resource group
-- AKS Automatic cluster
+- AKS cluster (Standard tier) with Gateway API and Istio app routing enabled
+- Anyscale operator installed as an AKS extension
 - User-assigned managed identity with federated credential for the Anyscale operator
 - Azure Container Registry (Standard SKU)
 - Storage account with HNS enabled and a private blob container
-- Azure Monitor workspace, Log Analytics workspace, and Application Insights for telemetry
-- AKS Gateway API enabled with Istio app routing support
+- Azure Monitor workspace, Log Analytics workspace, and Application Insights with OTLP endpoints
+- Prometheus data collection rules, endpoints, and alert rule groups
 - Anyscale Cloud and Cloud Resource via AzAPI (`Anyscale.Platform/clouds`)
-- Role assignments: Storage Blob Data Owner, AcrPush, Container Registry Tasks Contributor
+- Role assignments: Storage Blob Data Owner, AcrPush, Container Registry Tasks Contributor, AcrPull (kubelet), AKS RBAC Cluster Admin, Anyscale Platform Contributor
 
 A `sample-workload/` directory contains a Ray job manifest and Python script you can use to verify the deployment.
 
@@ -21,9 +22,13 @@ A `sample-workload/` directory contains a Ray job manifest and Python script you
 - Azure CLI authenticated to a subscription with the following Azure resource providers registered:
   - Anyscale.Platform
   - Microsoft.Authorization
+  - Microsoft.ContainerRegistry
   - Microsoft.ContainerService
+  - Microsoft.Insights
   - Microsoft.ManagedIdentity
+  - Microsoft.Monitor
   - Microsoft.Network
+  - Microsoft.OperationalInsights
   - Microsoft.Resources
   - Microsoft.Storage
 
@@ -61,8 +66,8 @@ terraform apply
 Review the variables in [variables.tf](./variables.tf) before deploying. Key options:
 
 - `location` - Azure region (default: `westus3`)
-- `system_node_pool_vm_count` - Number of system pool nodes (default: `3`)
-- `system_node_pool_vm_size` - VM size for the system pool (default: `Standard_D4s_v5`)
+- `system_node_pool_vm_count_min` - Minimum number of system pool nodes (default: `3`)
+- `system_node_pool_vm_count_max` - Maximum number of system pool nodes (default: `9`)
 
 Get the outputs
 

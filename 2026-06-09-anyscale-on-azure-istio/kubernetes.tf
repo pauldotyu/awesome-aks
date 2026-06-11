@@ -15,10 +15,11 @@ resource "azapi_resource" "aks" {
       dnsPrefix = "aks-${local.random_name}"
       agentPoolProfiles = [
         {
-          name   = "systempool"
-          mode   = "System"
-          count  = var.system_node_pool_vm_count
-          vmSize = var.system_node_pool_vm_size
+          name              = "systempool"
+          mode              = "System"
+          enableAutoScaling = true
+          minCount          = var.system_node_pool_vm_count_min
+          maxCount          = var.system_node_pool_vm_count_max
         }
       ]
       addonProfiles = {
@@ -89,7 +90,8 @@ resource "azapi_resource" "aks" {
   }
 
   response_export_values = [
-    "*"
+    "properties.oidcIssuerProfile.issuerURL",
+    "properties.identityProfile.kubeletidentity.objectId"
   ]
 }
 
@@ -98,24 +100,6 @@ resource "azurerm_role_assignment" "aks_admin" {
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
   scope                = azapi_resource.aks.id
 }
-
-# resource "azurerm_kubernetes_cluster_node_pool" "example" {
-#   name                        = "raypool"
-#   kubernetes_cluster_id       = azurerm_kubernetes_cluster.example.id
-#   vm_size                     = var.ray_node_pool_vm_size
-#   node_count                  = 1
-#   min_count                   = 1
-#   max_count                   = var.ray_node_pool_max_vm_count
-#   auto_scaling_enabled        = true
-#   gpu_driver                  = "None"
-#   temporary_name_for_rotation = "temp${random_integer.example.result}"
-
-#   upgrade_settings {
-#     drain_timeout_in_minutes      = 0
-#     max_surge                     = "10%"
-#     node_soak_duration_in_minutes = 0
-#   }
-# }
 
 resource "azurerm_role_assignment" "example" {
   principal_id                     = azapi_resource.aks.output.properties.identityProfile.kubeletidentity.objectId
