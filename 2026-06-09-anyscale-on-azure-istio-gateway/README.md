@@ -6,6 +6,7 @@ Terraform creates:
 
 - Resource group
 - AKS cluster (Standard tier) with Gateway API and Istio app routing enabled
+- GPU node pool with NVIDIA drivers managed by AKS
 - Anyscale operator installed as an AKS extension
 - User-assigned managed identity with federated credential for the Anyscale operator
 - Azure Container Registry (Standard SKU)
@@ -32,6 +33,12 @@ A `sample-workload/` directory contains a Ray job manifest and Python script you
   - Microsoft.OperationalInsights
   - Microsoft.Resources
   - Microsoft.Storage
+
+- The `ManagedGPUExperiencePreview` feature must be registered in the subscription to create GPU node pools with AKS-managed NVIDIA drivers. Register with the following command and wait for registration to complete before deploying. See [Create a fully managed GPU node pool on Azure Kubernetes Service (AKS) (preview)](https://learn.microsoft.com/en-us/azure/aks/aks-managed-gpu-nodes?tabs=add-ubuntu-gpu-node-pool%2Cmig-single%2Cdriver-only) for details.
+
+  ```bash
+  az feature register --namespace Microsoft.ContainerService --name ManagedGPUExperiencePreview
+  ```
 
 > [!TIP]
 > The AzureRM Terraform provider will automatically register required resource providers during deployment. If your account lacks permission to register providers, register them manually with `az provider register --namespace <provider-name>` before running `terraform apply`.
