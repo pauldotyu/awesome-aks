@@ -56,21 +56,14 @@ resource "azapi_resource" "aks" {
         }
       }
       ingressProfile = {
-        applicationLoadBalancer = {
-          enabled = false
-        }
         gatewayAPI = {
           installation = "Standard"
         }
         webAppRouting = {
-          enabled = false
           gatewayAPIImplementations = {
             appRoutingIstio = {
               mode = "Enabled"
             }
-          }
-          nginx = {
-            defaultIngressControllerType = "None"
           }
         }
       }
@@ -93,12 +86,6 @@ resource "azapi_resource" "aks" {
     "properties.oidcIssuerProfile.issuerURL",
     "properties.identityProfile.kubeletidentity.objectId"
   ]
-}
-
-resource "azurerm_role_assignment" "aks_admin" {
-  principal_id         = data.azurerm_client_config.current.object_id
-  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  scope                = azapi_resource.aks.id
 }
 
 resource "azurerm_role_assignment" "example" {
