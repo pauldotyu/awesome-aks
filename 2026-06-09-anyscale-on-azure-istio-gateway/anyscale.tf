@@ -104,3 +104,7 @@ resource "local_file" "anyscale_gateway" {
     }
   )
 }
+
+resource "kubectl_manifest" "anyscale_gateway" {
+  yaml_body = yamlencode(yamldecode(local_file.anyscale_gateway.content))
+}

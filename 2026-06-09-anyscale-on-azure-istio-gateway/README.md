@@ -14,6 +14,7 @@ Terraform creates:
 - Prometheus data collection rules, endpoints, and alert rule groups
 - Anyscale Cloud and Cloud Resource via AzAPI (`Anyscale.Platform/clouds`)
 - Role assignments: Storage Blob Data Owner, AcrPush, Container Registry Tasks Contributor, AcrPull (kubelet), AKS RBAC Cluster Admin, Anyscale Platform Contributor
+- Create and apply gateway manifest (`anyscale-gateway.yaml`, generated from [anyscale-gateway.tmpl](./anyscale-gateway.tmpl))
 
 A `sample-workload/` directory contains a Ray job manifest and Python script you can use to verify the deployment.
 
@@ -94,14 +95,6 @@ Log into the AKS cluster.
 ```bash
 az aks get-credentials -g $RG_NAME -n $AKS_NAME
 ```
-
-Deploy the gateway
-
-```bash
-kubectl apply -f anyscale-gateway.yaml
-```
-
-The `anyscale-gateway.yaml` manifest is generated from [anyscale-gateway.tmpl](./anyscale-gateway.tmpl) by Terraform.
 
 ## Verify
 

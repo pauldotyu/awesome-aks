@@ -88,6 +88,13 @@ resource "azapi_resource" "aks" {
   ]
 }
 
+resource "azapi_resource_action" "get_aks_creds" {
+  type                   = azapi_resource.aks.type
+  resource_id            = azapi_resource.aks.id
+  action                 = "listClusterAdminCredential"
+  response_export_values = ["*"]
+}
+
 resource "azurerm_role_assignment" "example" {
   principal_id                     = azapi_resource.aks.output.properties.identityProfile.kubeletidentity.objectId
   role_definition_name             = "AcrPull"
