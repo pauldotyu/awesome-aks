@@ -129,7 +129,7 @@ Submit the sample Ray job to confirm end-to-end. The `--cloud` flag takes the fu
 
 ```bash
 cd sample-workload
-anyscale job submit -f job.yaml --cloud $ANYSCALE_CLOUD_RESOURCE_ID --wait
+anyscale job submit -f job.yaml --cloud $ANYSCALE_CLOUD_NAME --wait
 ```
 
 ## Cleanup

@@ -15,10 +15,11 @@ resource "azapi_resource" "aks" {
       dnsPrefix = "aks-${local.random_name}"
       agentPoolProfiles = [
         {
-          name   = "systempool"
-          mode   = "System"
-          count  = var.system_node_pool_vm_count
-          vmSize = var.system_node_pool_vm_size
+          name       = "systempool"
+          mode       = "System"
+          count      = var.system_node_pool_vm_count
+          vmSize     = var.system_node_pool_vm_size
+          nodeTaints = ["CriticalAddonsOnly=true:NoSchedule"]
         }
       ]
       addonProfiles = {
