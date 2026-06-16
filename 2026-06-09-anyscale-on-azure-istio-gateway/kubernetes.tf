@@ -15,11 +15,10 @@ resource "azapi_resource" "aks" {
       dnsPrefix = "aks-${local.random_name}"
       agentPoolProfiles = [
         {
-          name              = "systempool"
-          mode              = "System"
-          enableAutoScaling = true
-          minCount          = var.system_node_pool_vm_count_min
-          maxCount          = var.system_node_pool_vm_count_max
+          name   = "systempool"
+          mode   = "System"
+          count  = var.system_node_pool_vm_count
+          vmSize = var.system_node_pool_vm_size
         }
       ]
       addonProfiles = {
@@ -67,6 +66,17 @@ resource "azapi_resource" "aks" {
           }
         }
       }
+      networkProfile = {
+        networkPlugin     = "azure"
+        networkPluginMode = "overlay"
+        networkPolicy     = "cilium"
+        networkDataplane  = "cilium"
+        loadBalancerSku   = "Standard"
+      }
+      nodeProvisioningProfile = {
+        defaultNodePools = "Auto"
+        mode             = "Auto"
+      }
       oidcIssuerProfile = {
         enabled = true
       }
@@ -86,35 +96,6 @@ resource "azapi_resource" "aks" {
     "properties.oidcIssuerProfile.issuerURL",
     "properties.identityProfile.kubeletidentity.objectId"
   ]
-}
-
-resource "azapi_resource" "aks_gpu_pool" {
-  type      = "Microsoft.ContainerService/managedClusters/agentPools@2026-03-02-preview"
-  name      = "gpupool"
-  parent_id = azapi_resource.aks.id
-
-  // this required when azapi local schema check isn't aware of the latest api version
-  schema_validation_enabled = false
-
-  body = {
-    properties = {
-      enableAutoScaling = true
-      gpuProfile = {
-        driver     = "Install"
-        nvidia = {
-          managementMode = "Managed"
-        }
-      }
-      maxCount = var.gpu_node_pool_max_vm_count
-      minCount = var.gpu_node_pool_min_vm_count
-      mode     = "User"
-      nodeTaints = [
-        "sku=gpu:NoSchedule"
-      ]
-      type   = "VirtualMachineScaleSets"
-      vmSize = var.gpu_node_pool_vm_size
-    }
-  }
 }
 
 resource "azapi_resource_action" "get_aks_creds" {
