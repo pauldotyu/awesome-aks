@@ -25,6 +25,23 @@ resource "azurerm_cognitive_deployment" "example" {
   }
 }
 
+resource "azurerm_cognitive_deployment" "image" {
+  cognitive_account_id = azurerm_cognitive_account.example.id
+  name                 = "gpt-image-2"
+  rai_policy_name      = "Microsoft.DefaultV2"
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-image-2"
+    version = "2026-04-21"
+  }
+
+  sku {
+    name     = "GlobalStandard"
+    capacity = 5
+  }
+}
+
 resource "azurerm_role_assignment" "me" {
   principal_id         = data.azurerm_client_config.current.object_id
   role_definition_name = "Cognitive Services OpenAI User"
