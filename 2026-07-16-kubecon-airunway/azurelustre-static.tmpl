@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azurelustre-static
+provisioner: azurelustre.csi.azure.com
+parameters:
+  mgs-ip-address: ${MGS_IP_ADDRESS}
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+mountOptions:
+  - noatime
+  - flock
