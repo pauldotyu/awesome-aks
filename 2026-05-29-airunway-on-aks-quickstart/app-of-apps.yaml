@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/pauldotyu/ai-runway-takeoff.git
-    targetRevision: HEAD
+    targetRevision: ca4b4af2863a748f2e2a50528d2494ae096445e0
     path: argocd/apps
   destination:
     server: https://kubernetes.default.svc
