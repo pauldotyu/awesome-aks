@@ -3,7 +3,7 @@ resource "azurerm_kubernetes_cluster" "example" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "aks-${local.random_name}"
-  kubernetes_version  = "1.35"
+  kubernetes_version  = "1.36"
 
   default_node_pool {
     name                 = "default"
