@@ -23,3 +23,13 @@ output "mf_api_key" {
   value       = azurerm_cognitive_account.example.primary_access_key
   sensitive   = true
 }
+
+output "otel_logs_endpoint" {
+  description = "The endpoint for OpenTelemetry logs"
+  value       = azapi_resource.otel.output.properties.OTLPLogsEndpoint
+}
+
+output "otel_metrics_endpoint" {
+  description = "The endpoint for OpenTelemetry metrics"
+  value       = azapi_resource.otel.output.properties.OTLPMetricsEndpoint
+}

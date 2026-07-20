@@ -21,7 +21,7 @@ resource "azurerm_cognitive_deployment" "example" {
 
   sku {
     name     = "GlobalStandard"
-    capacity = 10000
+    capacity = 200
   }
 }
 
@@ -38,7 +38,7 @@ resource "azurerm_cognitive_deployment" "image" {
 
   sku {
     name     = "GlobalStandard"
-    capacity = 5
+    capacity = 2
   }
 }
 
@@ -58,14 +58,6 @@ resource "azurerm_role_assignment" "mi" {
   principal_id         = azurerm_user_assigned_identity.example.principal_id
   role_definition_name = "Cognitive Services OpenAI User"
   scope                = azurerm_cognitive_account.example.id
-}
-
-resource "azurerm_federated_identity_credential" "aks-agent" {
-  user_assigned_identity_id = azurerm_user_assigned_identity.example.id
-  name                      = "aks-agent"
-  issuer                    = azapi_resource.aks.output.properties.oidcIssuerProfile.issuerURL
-  audience                  = ["api://AzureADTokenExchange"]
-  subject                   = "system:serviceaccount:aks-agent-system:aks-agent-sa"
 }
 
 resource "azurerm_federated_identity_credential" "contoso-air" {
