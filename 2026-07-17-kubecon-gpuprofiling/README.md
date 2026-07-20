@@ -232,7 +232,7 @@ Import the Inspektor Gadget Advanced GPU Observability dashboard.
 az grafana dashboard create \
   -n "$GRAFANA_NAME" \
   -g "$RG_NAME" \
-  --definition "$(curl -sSL https://raw.githubusercontent.com/inspektor-gadget/grafana-dashboards/refs/heads/main/dashboards/gpu-observability/AdvancedGPUObservability.json)"
+  --definition "$(curl -sSL https://raw.githubusercontent.com/pauldotyu/awesome-aks/refs/heads/main/2026-07-17-kubecon-gpuprofiling/AdvancedGPUObservability.json)"
 ```
 
 Open the dashboard.
@@ -245,7 +245,7 @@ echo "${GRAFANA_URL}/d/AdvancedGPUObservability"
 
 With the cluster, GPU node pool, and Grafana wired up, the demo flow is:
 
-1. **Create a workspace/training template in the Anyscale cloud.** From the [Anyscale console](https://console.azure.anyscale.com) (the cloud registered above), start a workspace or job template that targets this cloud. Anyscale provisions a KubeRay cluster on AKS (Ray head and worker pods), and Node Autoprovisioning brings up a GPU node from the `nvidia` node pool to satisfy the GPU request.
+1. **Create a workspace/training template in the Anyscale cloud.** From the [Anyscale console](https://console.azure.anyscale.com) (the cloud registered above), run through the [Fine-tuning Stable Diffusion XL with Ray Train](https://console.anyscale.com/template-preview/finetune-stable-diffusion) template that targets this cloud. Anyscale provisions a KubeRay cluster on AKS (Ray head and worker pods), and Node Autoprovisioning brings up a GPU node from the `nvidia` node pool to satisfy the GPU request.
 2. **Run a training job (notebook).** Launch a KubeRay training notebook/job that exercises the GPU (for example a model fine-tuning or training loop). Ray places the GPU work on the provisioned GPU node.
 3. **Profile GPU memory utilization.** While the job runs, watch the signals in Grafana:
    - The **Advanced GPU Observability** dashboard (managed Prometheus) shows GPU utilization, memory used/free, and temperature per GPU.
