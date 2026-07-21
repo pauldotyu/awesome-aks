@@ -47,16 +47,16 @@ resource "helm_release" "kaito_workspace" {
   create_namespace = true
 
   set = concat(
-    [
-      {
-        name  = "image.repository"
-        value = "ghcr.io/kaito-project/kaito/workspace"
-      },
-      {
-        name  = "image.tag"
-        value = "nightly-latest"
-      }
-    ],
+    # [
+    #   {
+    #     name  = "image.repository"
+    #     value = "ghcr.io/kaito-project/kaito/workspace"
+    #   },
+    #   {
+    #     name  = "image.tag"
+    #     value = "nightly-latest"
+    #   }
+    # ],
     [
       for feature in var.kaito_workspace_features : {
         name  = "featureGates.${feature}"

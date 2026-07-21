@@ -30,25 +30,10 @@ az grafana data-source show -n "$GRAFANA_NAME" --data-source local-pyroscope
 ```
 
 ```bash
-az grafana data-source create -n "$GRAFANA_NAME" -g "$RG_NAME" --definition "{
-  \"name\": \"$PROMETHEUS_NAME\",
-  \"type\": \"prometheus\",
-  \"access\": \"proxy\",
-  \"url\": \"$PROMETHEUS_ENDPOINT\",
-  \"jsonData\": {
-    \"httpMethod\": \"POST\",
-    \"azureCredentials\": { \"authType\": \"msi\" }
-  }
-}" --debug
-
-az grafana data-source show -n "$GRAFANA_NAME" --data-source "$PROMETHEUS_NAME"
-```
-
-```bash
 az grafana dashboard create \
   -n "$GRAFANA_NAME" \
   -g "$RG_NAME" \
-  --definition "$(curl -sSL https://raw.githubusercontent.com/inspektor-gadget/grafana-dashboards/refs/heads/main/dashboards/gpu-observability/AdvancedGPUObservability.json)"
+  --definition "$(curl -sSL https://gist.githubusercontent.com/mqasimsarfraz/fca8e2394beb7454f467cf82785e2ee3/raw/2eb00a3853362bc863c292283041e8e283fe46ed/AdvancedGPUObservability.json)"
 ```
 
 ```bash
@@ -67,16 +52,35 @@ kubectl apply -f - <<EOF
 apiVersion: kaito.sh/v1beta1
 kind: Workspace
 metadata:
-  name: workspace-gemma4-e4b
+  name: workspace-granite-4-1-8b
 inference:
   preset:
     accessMode: public
-    name: google/gemma-4-E4B-it
+    name: ibm-granite/granite-4.1-8b
 resource:
   count: 1
-  instanceType: Standard_NC40ads_H100_v5 #Standard_NC24ads_A100_v4
+  instanceType: Standard_NC24ads_A100_v4
   labelSelector:
     matchLabels:
-      app: workspace-gemma4-e4b
+      app: workspace-granite-4-1-8b
+EOF
+```
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: kaito.sh/v1beta1
+kind: Workspace
+metadata:
+  name: workspace-granite-4-1-8b
+inference:
+  preset:
+    accessMode: public
+    name: ibm-granite/granite-4.1-8b
+resource:
+  count: 1
+  instanceType: Standard_NV36ads_A10_v5
+  labelSelector:
+    matchLabels:
+      app: workspace-granite-4-1-8b
 EOF
 ```

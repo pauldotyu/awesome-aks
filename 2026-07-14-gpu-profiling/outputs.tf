@@ -19,5 +19,6 @@ output "prometheus_endpoint" {
 }
 
 output "pyroscope_url" {
-  value = "http://${data.azapi_resource.pyroscope_managed_private_endpoint.output.properties.privateLinkServicePrivateIP}:4040"
+  description = "In-cluster Pyroscope endpoint Grafana reaches over the managed private endpoint (private IP:4040)."
+  value       = try("http://${data.azapi_resource.pyroscope_managed_private_endpoint.output.properties.privateLinkServicePrivateIP}:4040", "needs_refresh")
 }
