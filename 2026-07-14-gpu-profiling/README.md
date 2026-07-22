@@ -52,35 +52,47 @@ kubectl apply -f - <<EOF
 apiVersion: kaito.sh/v1beta1
 kind: Workspace
 metadata:
-  name: workspace-granite-4-1-8b
+  name: workspace-granite-4-1-3b
 inference:
   preset:
     accessMode: public
-    name: ibm-granite/granite-4.1-8b
+    name: ibm-granite/granite-4.1-3b
 resource:
   count: 1
   instanceType: Standard_NC24ads_A100_v4
   labelSelector:
     matchLabels:
-      app: workspace-granite-4-1-8b
+      app: workspace-granite-4-1-3b
 EOF
 ```
 
+T4 compute capability 7.5; therefore, it is unable to use FlashAttention 2. FA2 is only supported on devices with compute capability >=8 so will need to fall back to TRITON_ATTN
+
 ```bash
 kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workspace-granite-4-1-3b-config
+data:
+  inference_config.yaml: |
+    vllm:
+      attention-backend: TRITON_ATTN 
+---
 apiVersion: kaito.sh/v1beta1
 kind: Workspace
 metadata:
-  name: workspace-granite-4-1-8b
+  name: workspace-granite-4-1-3b
 inference:
+  config: workspace-granite-4-1-3b-config
   preset:
     accessMode: public
-    name: ibm-granite/granite-4.1-8b
+    name: ibm-granite/granite-4.1-3b
 resource:
   count: 1
-  instanceType: Standard_NV36ads_A10_v5
+  instanceType: Standard_NC4as_T4_v3
   labelSelector:
     matchLabels:
-      app: workspace-granite-4-1-8b
+      app: workspace-granite-4-1-3b
 EOF
 ```

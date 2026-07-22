@@ -24,3 +24,9 @@ resource "azurerm_role_assignment" "grafana2" {
   principal_id         = azurerm_dashboard_grafana.example.identity[0].principal_id
   role_definition_name = "Monitoring Data Reader"
 }
+
+resource "azurerm_role_assignment" "grafana3" {
+  scope                = azurerm_resource_group.example.id
+  principal_id         = azurerm_dashboard_grafana.example.identity[0].principal_id
+  role_definition_name = "Monitoring Reader"
+}

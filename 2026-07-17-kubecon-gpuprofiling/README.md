@@ -232,7 +232,7 @@ Import the Inspektor Gadget Advanced GPU Observability dashboard.
 az grafana dashboard create \
   -n "$GRAFANA_NAME" \
   -g "$RG_NAME" \
-  --definition "$(curl -sSL https://raw.githubusercontent.com/pauldotyu/awesome-aks/refs/heads/main/2026-07-17-kubecon-gpuprofiling/AdvancedGPUObservability.json)"
+  --definition "$(curl -sSL https://gist.githubusercontent.com/mqasimsarfraz/fca8e2394beb7454f467cf82785e2ee3/raw/2eb00a3853362bc863c292283041e8e283fe46ed/AdvancedGPUObservability.json)"
 ```
 
 Open the dashboard.
