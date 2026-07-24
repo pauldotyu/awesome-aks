@@ -1,0 +1,9 @@
+config:
+  oidc:
+    clientID: "${HEADLAMP_APP_CLIENT_ID}"
+    clientSecret: "${HEADLAMP_APP_CLIENT_SECRET}"
+    issuerURL: "https://login.microsoftonline.com/${AZURE_TENANT_ID}/v2.0"
+    scopes: "${AKS_AAD_SERVER_APP_CLIENT_ID}/user.read,openid,email,profile"
+    validatorClientID: "${AKS_AAD_SERVER_APP_CLIENT_ID}"
+    validatorIssuerURL: "https://sts.windows.net/${AZURE_TENANT_ID}/"
+    useAccessToken: true
