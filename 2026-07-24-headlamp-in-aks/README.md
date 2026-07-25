@@ -33,7 +33,7 @@ Recommended versions:
 - Helm >= 4.2
 
 > [!IMPORTANT]
-> You must own a publicly registered domain and be able to delegate its nameservers to Azure DNS. If you don't want to delegate a domain, you can still run this example by adding a hosts file entry on your local machine pointing `headlamp.<your-domain>` to the Gateway's public IP. This lets you access the site locally without full DNS delegation, though Let's Encrypt certificate issuance will not work without DNS-01 validation.
+> You must own a publicly registered domain and be able to delegate its nameservers to Azure DNS.
 
 > [!WARNING]
 > Federated identity credentials for Headlamp are currently non-functional. Headlamp's SSO flow relies on an app registration client secret rather than workload identity, so the federated credential created by Terraform is not used. This needs further investigation to determine whether workload identity federation is possible for Headlamp's OIDC integration, so for now the setup falls back to service principal credentials.
