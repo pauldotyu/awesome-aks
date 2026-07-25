@@ -33,9 +33,9 @@ Recommended versions:
 - Helm >= 4.2
 
 > [!IMPORTANT]
-> You must own a publicly registered domain and be able to delegate its nameservers to Azure DNS.
+> You must own a publicly registered domain and be able to delegate its nameservers to Azure DNS. Nameserver delegation is required so that cert-manager can complete DNS-01 validation with Let's Encrypt and issue a valid TLS certificate.
 
-> [!WARNING]
+> [!NOTE]
 > Federated identity credentials for Headlamp are currently non-functional. Headlamp's SSO flow relies on an app registration client secret rather than workload identity, so the federated credential created by Terraform is not used. This needs further investigation to determine whether workload identity federation is possible for Headlamp's OIDC integration, so for now the setup falls back to service principal credentials.
 
 ## Provision Azure resources
