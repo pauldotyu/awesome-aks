@@ -74,10 +74,10 @@ resource "azurerm_role_assignment" "aks_admin" {
   scope                = azapi_resource.aks.id
 }
 
-resource "azurerm_role_assignment" "example" {
+resource "azurerm_role_assignment" "aks_acr_pull" {
   principal_id                     = azapi_resource.aks.output.properties.identityProfile.kubeletidentity.objectId
-  role_definition_name             = "AcrPull"
   scope                            = azurerm_container_registry.example.id
+  role_definition_name             = "AcrPull"
   skip_service_principal_aad_check = true
 }
 

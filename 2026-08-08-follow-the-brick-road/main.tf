@@ -13,10 +13,6 @@ resource "random_string" "example" {
   numeric = false
 }
 
-locals {
-  random_name = "buildltg408${random_string.example.result}"
-}
-
 resource "azurerm_resource_group" "example" {
   name     = "rg-${local.random_name}"
   location = var.location

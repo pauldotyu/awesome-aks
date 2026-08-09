@@ -19,27 +19,27 @@ resource "azurerm_federated_identity_credential" "cert_manager" {
   subject                   = "system:serviceaccount:cert-manager:cert-manager"
 }
 
-resource "helm_release" "cert_manager" {
-  name             = "cert-manager"
-  chart            = "oci://quay.io/jetstack/charts/cert-manager"
-  version          = "v1.21.0"
-  namespace        = "cert-manager"
-  create_namespace = true
+# resource "helm_release" "cert_manager" {
+#   name             = "cert-manager"
+#   chart            = "oci://quay.io/jetstack/charts/cert-manager"
+#   version          = "v1.21.0"
+#   namespace        = "cert-manager"
+#   create_namespace = true
 
-  set = [
-    {
-      name  = "crds.enabled"
-      value = "true"
-    },
-    {
-      name  = "podLabels.azure\\.workload\\.identity/use"
-      value = "true"
-      type  = "string"
-    },
-    {
-      name  = "serviceAccount.annotations.azure\\.workload\\.identity/client-id"
-      value = azurerm_user_assigned_identity.cert_manager.client_id
-      type  = "string"
-    }
-  ]
-}
+#   set = [
+#     {
+#       name  = "crds.enabled"
+#       value = "true"
+#     },
+#     {
+#       name  = "podLabels.azure\\.workload\\.identity/use"
+#       value = "true"
+#       type  = "string"
+#     },
+#     {
+#       name  = "serviceAccount.annotations.azure\\.workload\\.identity/client-id"
+#       value = azurerm_user_assigned_identity.cert_manager.client_id
+#       type  = "string"
+#     }
+#   ]
+# }
