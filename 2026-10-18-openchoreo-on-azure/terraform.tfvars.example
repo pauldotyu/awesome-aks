@@ -1,0 +1,36 @@
+# Copy to terraform.tfvars and adjust as needed:
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# ---------------------------------------------------------------------------
+# Subscription boundaries
+# ---------------------------------------------------------------------------
+# subscription_id pins the subscription that hosts the environment (AKS, Key
+# Vault, managed identities, federated credentials). Pinning it explicitly
+# means the environment can never land in the subscription that holds the
+# Azure DNS zone, even if the Azure CLI default subscription changes.
+#
+# Only two things are ever written to the DNS zone's subscription, both of
+# them attachments to the pre-existing zone rather than environment
+# infrastructure: the DNS Zone Contributor role assignment for cert-manager and
+# the console/api A records. Both can be switched off with
+# manage_cert_manager_dns_role / manage_dns_a_records.
+#
+subscription_id = "3f9582cc-bcd7-4c17-9063-ab38965e3914"
+
+# ---------------------------------------------------------------------------
+# Pre-existing Azure DNS zone
+# ---------------------------------------------------------------------------
+# The zone already exists and the domain's registrar nameservers are already
+# delegated to it, so Terraform looks it up instead of creating it
+# (var.create_dns_zone defaults to false).
+#
+# The zone lives in a different subscription than the cluster, which is why
+# both values are needed:
+#   dns_zone_resource_group_name - the resource group holding the zone
+#   dns_zone_subscription_id     - the subscription holding the zone
+#
+# Find them with:
+#   az network dns zone list --query "[?name=='aks.rocks'].{rg:resourceGroup, id:id}" -o tsv
+#
+dns_zone_resource_group_name = "rg-blog"
+dns_zone_subscription_id     = "9445bf79-e177-49e7-9ce3-a831ca9461ae"
