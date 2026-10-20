@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: backstage-tls
+  namespace: backstage
+spec:
+  secretName: backstage-tls
+  privateKey:
+    rotationPolicy: Always
+  commonName: backstage.${DNS_ZONE_NAME}
+  dnsNames:
+    - backstage.${DNS_ZONE_NAME}
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer

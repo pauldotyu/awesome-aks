@@ -1,0 +1,20 @@
+apiVersion: opentofu.m.upbound.io/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: provider-opentofu
+spec:
+  configuration: |
+    terraform {
+      backend "azurerm" {
+        use_oidc                  = true
+        use_azuread_auth          = true
+        oidc_token_file_path      = "/var/run/secrets/azure/tokens/azure-identity-token"
+        client_id                 = "${PROVISIONER_CLIENT_ID}"
+        tenant_id                 = "${AZURE_TENANT_ID}"
+        subscription_id           = "${AZURE_SUBSCRIPTION_ID}"
+        resource_group_name       = "${RESOURCE_GROUP_NAME}"
+        storage_account_name      = "${STORAGE_ACCOUNT_NAME}"
+        container_name            = "${CONTAINER_NAME}"
+        key                       = "terraform.tfstate"
+      }
+    }

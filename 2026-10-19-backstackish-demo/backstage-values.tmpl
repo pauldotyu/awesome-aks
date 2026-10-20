@@ -1,0 +1,46 @@
+gateway:
+  enabled: true
+  className: approuting-istio
+  host: backstage.${DNS_ZONE_NAME}
+  tls:
+    enabled: true
+    certManager:
+      issuerRef:
+        name: letsencrypt-staging
+        kind: ClusterIssuer
+
+appConfig:
+  app:
+    baseUrl: https://backstage.${DNS_ZONE_NAME}
+  backend:
+    baseUrl: https://backstage.${DNS_ZONE_NAME}
+    cors:
+      origin: https://backstage.${DNS_ZONE_NAME}
+
+  auth:
+    environment: production
+    providers:
+      microsoft:
+        production:
+          clientId: ${AZURE_CLIENT_ID}
+          clientSecret: ${AZURE_CLIENT_SECRET}
+          tenantId: ${AZURE_TENANT_ID}
+          domainHint: ${AZURE_TENANT_ID}
+          signIn:
+            resolvers:
+              - resolver: emailMatchingUserEntityAnnotation
+
+  catalog:
+    providers:
+      microsoftGraphOrg:
+        default:
+          tenantId: ${AZURE_TENANT_ID}
+          clientId: ${AZURE_CLIENT_ID}
+          clientSecret: ${AZURE_CLIENT_SECRET}
+          userGroupMember:
+            filter: id eq '${AZURE_GROUP_ID}'
+          group:
+            filter: id eq '${AZURE_GROUP_ID}'
+          schedule:
+            frequency: { minutes: 30 }
+            timeout: { minutes: 3 }

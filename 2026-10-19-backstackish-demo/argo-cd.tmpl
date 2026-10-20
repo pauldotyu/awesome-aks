@@ -1,0 +1,66 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-tls
+  namespace: argocd
+spec:
+  secretName: argocd-tls
+  privateKey:
+    rotationPolicy: Always
+  commonName: argocd.${DNS_ZONE_NAME}
+  dnsNames:
+    - argocd.${DNS_ZONE_NAME}
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: argocd-gateway
+  namespace: argocd
+  annotations:
+    cert-manager.io/issuer: letsencrypt-staging
+spec:
+  gatewayClassName: approuting-istio
+  infrastructure:
+    annotations:
+      service.beta.kubernetes.io/port_80_health-probe_protocol: tcp
+      service.beta.kubernetes.io/port_443_health-probe_protocol: tcp
+      service.beta.kubernetes.io/port_15021_health-probe_protocol: tcp
+  listeners:
+    - protocol: HTTPS
+      port: 443
+      name: https
+      hostname: "argocd.${DNS_ZONE_NAME}"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: argocd-tls
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argocd-httproute
+  namespace: argocd
+spec:
+  parentRefs:
+    - name: argocd-gateway
+      namespace: argocd
+  hostnames:
+    - "argocd.${DNS_ZONE_NAME}"
+  rules:
+    - backendRefs:
+        - name: argocd-server
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
