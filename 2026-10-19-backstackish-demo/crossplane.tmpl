@@ -46,3 +46,17 @@ spec:
   package: xpkg.upbound.io/upbound/provider-opentofu:${PROVIDER_OPENTOFU_VERSION}
   runtimeConfigRef:
     name: provider-opentofu
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: function-go-templating
+spec:
+  package: xpkg.crossplane.io/crossplane-contrib/function-go-templating:${FUNCTION_GO_TEMPLATING_VERSION}
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: function-auto-ready
+spec:
+  package: xpkg.crossplane.io/crossplane-contrib/function-auto-ready:${FUNCTION_AUTO_READY_VERSION}

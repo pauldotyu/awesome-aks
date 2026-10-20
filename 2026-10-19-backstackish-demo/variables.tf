@@ -48,6 +48,18 @@ variable "crossplane_provider_opentofu_version" {
   default     = "v1.1.10"
 }
 
+variable "crossplane_function_go_templating_version" {
+  description = "The version of the Crossplane Go Templating function."
+  type        = string
+  default     = "v0.13.1"
+}
+
+variable "crossplane_function_auto_ready_version" {
+  description = "The version of the Crossplane Auto Ready function."
+  type        = string
+  default     = "v0.7.1"
+}
+
 variable "backstage_github_token" {
   description = "The GitHub Personal Access Token (PAT) for Backstage."
   type        = string
