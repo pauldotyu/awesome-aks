@@ -45,6 +45,11 @@ resource "azurerm_kubernetes_cluster" "control" {
     outbound_type       = "loadBalancer"
     load_balancer_sku   = "standard"
   }
+
+  # Ignore fields we customized below
+  lifecycle {
+    ignore_changes = [web_app_routing]
+  }
 }
 
 resource "azapi_update_resource" "add_cluster_features" {
