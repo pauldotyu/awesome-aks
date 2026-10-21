@@ -46,6 +46,12 @@ variable "crossplane_provider_opentofu_version" {
   default     = "v1.1.10"
 }
 
+variable "crossplane_provider_kubernetes_version" {
+  description = "The version of the Crossplane Kubernetes provider."
+  type        = string
+  default     = "v1.4.1"
+}
+
 variable "crossplane_function_go_templating_version" {
   description = "The version of the Crossplane Go Templating function."
   type        = string

@@ -69,6 +69,7 @@ resource "local_file" "opentofu_provider" {
       AZURE_TENANT_ID                      = data.azuread_client_config.current.tenant_id
       AZURE_SUBSCRIPTION_ID                = data.azurerm_client_config.current.subscription_id
       PROVIDER_OPENTOFU_VERSION            = var.crossplane_provider_opentofu_version
+      PROVIDER_KUBERNETES_VERSION          = var.crossplane_provider_kubernetes_version
       FUNCTION_GO_TEMPLATING_VERSION       = var.crossplane_function_go_templating_version
       FUNCTION_AUTO_READY_VERSION          = var.crossplane_function_auto_ready_version
       FUNCTION_ENVIRONMENT_CONFIGS_VERSION = var.crossplane_function_environment_configs_version
