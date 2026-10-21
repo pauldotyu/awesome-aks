@@ -35,6 +35,11 @@ resource "helm_release" "external_secrets" {
       value = "true"
     },
     {
+      name  = "crds.annotations.helm\\.sh/resource-policy"
+      value = "keep"
+      type  = "string"
+    },
+    {
       name  = "serviceAccount.annotations.azure\\.workload\\.identity/client-id"
       value = azurerm_user_assigned_identity.external_secrets.client_id
       type  = "string"

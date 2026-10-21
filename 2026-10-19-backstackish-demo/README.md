@@ -377,4 +377,73 @@ Setup another Argo CD application that recursively checks for changes in the req
 kubectl apply -f https://raw.githubusercontent.com/pauldotyu/crossplane-opentofu-demo/refs/heads/main/argocd/agent-environments.yaml
 ```
 
-From this point on, navigate to Backstage and import templates and create new resources based on the imported templates.
+From this point on, navigate to Backstage and import the following templates:
+
+- [https://github.com/pauldotyu/backstage/blob/main/templates/create-agent-environment/template.yaml](https://github.com/pauldotyu/backstage/blob/main/templates/create-agent-environment/template.yaml)
+- [https://github.com/pauldotyu/backstage/blob/main/templates/delete-agent-environment/template.yaml](https://github.com/pauldotyu/backstage/blob/main/templates/delete-agent-environment/template.yaml)
+- [https://github.com/pauldotyu/backstage/blob/main/templates/create-maf-app/template.yaml](https://github.com/pauldotyu/backstage/blob/main/templates/create-maf-app/template.yaml)
+
+## Teardown
+
+Delete any Crossplane-managed requests and workspaces first, and wait for their
+external Azure resources to be deleted while the providers are still running.
+
+Uninstall Backstage and delete its ExternalSecret and SecretStore while External
+Secrets Operator is still running. These resources were installed manually, so
+Terraform does not manage their deletion order.
+
+```sh
+helm uninstall backstage -n backstage
+kubectl delete -f kubernetes/external-secrets.yaml --timeout=120s
+```
+
+If deletion times out, resolve the operator or finalizer issue before continuing.
+Check for other ExternalSecrets and SecretStores and remove any demo resources
+that still require operator cleanup.
+
+```sh
+kubectl get externalsecrets.external-secrets.io,secretstores.external-secrets.io -A
+```
+
+Then destroy the Terraform-managed infrastructure:
+
+```sh
+terraform destroy
+```
+
+The External Secrets Helm release retains its CRDs using
+`helm.sh/resource-policy: keep`. This prevents Helm from deleting CRDs and their
+custom resources at the same time as the operator responsible for processing
+their finalizers. cert-manager also retains its CRDs. Helm information messages
+about these retained resources are expected. When destroying the whole AKS
+cluster, the retained CRDs disappear with the cluster.
+
+For an existing deployment, apply the retention setting with `terraform apply`
+before uninstalling the release. Changing the configuration alone does not update
+the installed Helm release.
+
+### External Secrets uninstall timeout
+
+If an uninstall has already removed the operator, check whether an ExternalSecret
+and its CRD are stuck deleting:
+
+```sh
+kubectl get crd externalsecrets.external-secrets.io \
+  -o jsonpath='{.metadata.deletionTimestamp}{"\n"}{.status.conditions}{"\n"}'
+kubectl get externalsecrets.external-secrets.io -A \
+  -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,DELETING:.metadata.deletionTimestamp,FINALIZERS:.metadata.finalizers'
+kubectl get pods -n external-secrets
+```
+
+A terminating CRD with `InstanceDeletionInProgress` and an ExternalSecret with
+`externalsecrets.external-secrets.io/externalsecret-cleanup` indicate unfinished
+operator cleanup. Increasing the Helm timeout will not resolve an orphaned
+finalizer when the operator is gone.
+
+The retention setting prevents this deletion race on future uninstalls, but does
+not repair a CRD already terminating. Recovery requires restoring an operator
+capable of completing cleanup or explicitly approving targeted removal of the
+orphaned finalizer after reviewing its cleanup responsibilities. Removing a
+finalizer bypasses that cleanup and may leave generated Kubernetes Secrets behind.
+Do not remove the CRD's cleanup finalizer or delete Terraform state to hide the
+failure.
