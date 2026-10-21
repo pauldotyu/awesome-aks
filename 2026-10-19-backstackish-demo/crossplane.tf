@@ -51,7 +51,7 @@ resource "azurerm_role_assignment" "opentofu_rbac_administrator" {
   skip_service_principal_aad_check = true
 }
 
-resource "azurerm_federated_identity_credential" "crossplane" {
+resource "azurerm_federated_identity_credential" "opentofu" {
   user_assigned_identity_id = azurerm_user_assigned_identity.opentofu.id
   name                      = "provider-opentofu"
   issuer                    = azurerm_kubernetes_cluster.control.oidc_issuer_url
@@ -60,7 +60,7 @@ resource "azurerm_federated_identity_credential" "crossplane" {
 }
 
 
-resource "local_file" "crossplane_provider_opentofu" {
+resource "local_file" "opentofu_provider" {
   filename = "kubernetes/crossplane.yaml"
   content = templatefile("crossplane.tmpl",
     {
@@ -75,7 +75,7 @@ resource "local_file" "crossplane_provider_opentofu" {
   )
 }
 
-resource "local_file" "opentofu_config" {
+resource "local_file" "opentofu_state" {
   filename = "kubernetes/opentofu-state.yaml"
   content = templatefile("opentofu-state.tmpl",
     {

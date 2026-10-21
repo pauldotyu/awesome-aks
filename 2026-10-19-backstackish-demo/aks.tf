@@ -57,6 +57,7 @@ resource "azapi_update_resource" "add_cluster_features" {
           installation = "Standard"
         }
         webAppRouting = {
+          enabled = true
           gatewayAPIImplementations = {
             appRoutingIstio = {
               mode = "Enabled"

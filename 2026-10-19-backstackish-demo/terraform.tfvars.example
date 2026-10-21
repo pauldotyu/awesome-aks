@@ -1,0 +1,5 @@
+backstage_github_token    = "ghp_000000000000000000000000000000000000"
+backstage_user_object_ids = ["00000000-0000-0000-0000-000000000000"]
+argocd_user_object_ids    = ["00000000-0000-0000-0000-000000000000"]
+dns_zone_name             = "example.com"
+admin_email               = "your-email@example.com"

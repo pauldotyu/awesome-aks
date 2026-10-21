@@ -1,5 +1,7 @@
 # BACK-ish stack demo
 
+BACK stack platform engineering demo, but with an Azure twist 😉
+
 ## Environment setup
 
 Make sure you have the following prerequisites installed:
@@ -11,6 +13,14 @@ Make sure you have the following prerequisites installed:
 - [OpenTofu](https://opentofu.io/docs/getting-started/installation)
 
 ### Provision Azure infrastructure
+
+Set up your Terraform variables by copying the example file and filling in the required values:
+
+```sh
+cp terraform.tfvars.example terraform.tfvars
+```
+
+> Make sure to fill in the required values in `terraform.tfvars` before running Terraform.
 
 Run the Terraform
 
@@ -25,16 +35,40 @@ Get the output values
 read -r \
   RG_NAME \
   AKS_NAME \
-  DNS_ZONE_NAME <<< "$(terraform output -json | jq -r \
+  DNS_ZONE_NAME \
+  DNS_NAME_SERVERS <<< "$(terraform output -json | jq -r \
     '[.rg_name.value,
       .aks_name.value,
-      .dns_zone_name.value] | @tsv')"
+      .dns_zone_name.value,
+      (.dns_name_servers.value | join(" "))] | @tsv')"
+```
+
+Print the DNS zone name servers then make sure they are correctly configured in your DNS provider.
+
+```sh
+echo "$DNS_NAME_SERVERS" | tr ' ' '\n'
+```
+
+> GoDaddy does not want the trailing dot in the DNS zone name servers. Make sure to remove it as you configure it there.
+
+After updating your DNS provider with the name servers, wait for the changes to propagate before proceeding.
+
+```sh
+dig +short NS $DNS_ZONE_NAME
 ```
 
 Connect to the cluster
 
 ```sh
 az aks get-credentials -n $AKS_NAME -g $RG_NAME
+```
+
+### Configure external-dns
+
+Deploy the external-dns resources
+
+```sh
+kubectl apply -f kubernetes/external-dns.yaml
 ```
 
 ### Configure cert-manager
@@ -67,6 +101,12 @@ kubectl apply -f kubernetes/external-secrets.yaml
 
 > Source: [https://external-secrets.io/latest/provider/azure-key-vault/](https://external-secrets.io/latest/provider/azure-key-vault/)
 
+Make sure the secrets have synchronized successfully from Azure Key Vault before proceeding.
+
+```sh
+kubectl get secrets -n backstage backstage-secrets -oyaml
+```
+
 Install Backstage. The Helm chart will install the CertificateRequest and Gateway resources for Backstage.
 
 ```sh
@@ -85,11 +125,10 @@ kubectl get gateway -n backstage backstage
 Wait a few moments for the gateway to be programmed, then get the IP address to create a DNS record for the Argo CD hostname
 
 ```sh
-az network dns record-set a add-record \
+az network dns record-set a show \
 --zone-name $DNS_ZONE_NAME \
 --resource-group $RG_NAME \
---record-set-name backstage \
---ipv4-address $(kubectl get gateway -n backstage backstage -ojsonpath='{.status.addresses[0].value}')
+--name backstage
 ```
 
 Check the status of the certificate
@@ -119,11 +158,10 @@ kubectl get gateway -n argocd argocd-gateway
 Wait a few moments for the gateway to be programmed, then get the IP address to create a DNS record for the Argo CD hostname
 
 ```sh
-az network dns record-set a add-record \
+az network dns record-set a show \
 --zone-name $DNS_ZONE_NAME \
 --resource-group $RG_NAME \
---record-set-name argocd \
---ipv4-address $(kubectl get gateway -n argocd argocd-gateway -ojsonpath='{.status.addresses[0].value}')
+--name argocd
 ```
 
 Check the status of the certificate
@@ -146,7 +184,7 @@ Make sure the provider is installed and healthy since the next step will require
 
 ```sh
 kubectl get providers
-kubectl wait --for=condition=Healthy provider provider-opentofu --timeout=60s
+kubectl wait --for=condition=Healthy provider/provider-opentofu --timeout=60s
 ```
 
 Configure the OpenTofu provider
@@ -162,9 +200,9 @@ kubectl apply -f - <<EOF
 apiVersion: opentofu.m.upbound.io/v1beta1
 kind: Workspace
 metadata:
-  name: tofu-azure-rg-test
+  name: tofu-test
   annotations:
-    crossplane.io/external-name: tofu-azure-rg-test
+    crossplane.io/external-name: tofu-test
 spec:
   providerConfigRef:
     name: provider-opentofu
@@ -187,7 +225,7 @@ spec:
       }
 
       resource "azurerm_resource_group" "test" {
-        name     = "rg-tofu-crossplane-test"
+        name     = "rg-tofu-test"
         location = "westus3"
       }
 EOF
@@ -197,14 +235,14 @@ Check the status of the workspace deployment
 
 ```sh
 kubectl get workspaces
-kubectl describe workspace tofu-azure-rg-test
+kubectl describe workspace tofu-test
 ```
 
 Verify that the workspace has been successfully deployed and the resource group has been created in Azure.
 
 ```sh
 az group show \
---name rg-tofu-crossplane-test \
+--name rg-tofu-test \
 --query '{name:name,location:location,provisioningState:properties.provisioningState}' \
 -o yaml
 ```
@@ -212,143 +250,13 @@ az group show \
 Delete the workspace deployment
 
 ```sh
-kubectl delete workspace tofu-azure-rg-test
+kubectl delete workspace tofu-test
 ```
 
 Verify that the resource group has been deleted in Azure.
 
 ```sh
-az group show --name rg-tofu-crossplane-test
-```
-
-### Validate Crossplane + OpenTofu integration
-
-```sh
-kubectl apply -f - <<'EOF'
-apiVersion: apiextensions.crossplane.io/v2
-kind: CompositeResourceDefinition
-metadata:
-  name: xresourcegroup.platform.example.org
-spec:
-  group: platform.example.org
-  names:
-    kind: XResourceGroup
-    plural: xresourcegroups
-  versions:
-  - name: v1alpha1
-    served: true
-    referenceable: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
-          spec:
-            type: object
-            required:
-            - parameters
-            properties:
-              parameters:
-                type: object
-                required:
-                - name
-                - location
-                - requesterObjectId
-                properties:
-                  name:
-                    type: string
-                    pattern: '^rg-[a-z0-9-]{1,60}$'
-                  location:
-                    type: string
-                  requesterObjectId:
-                    type: string
-                    minLength: 1
-EOF
-```
-
-```sh
-kubectl apply -f - <<'EOF'
-apiVersion: apiextensions.crossplane.io/v1
-kind: Composition
-metadata:
-  name: resource-group
-spec:
-  compositeTypeRef:
-    apiVersion: platform.example.org/v1alpha1
-    kind: XResourceGroup
-  mode: Pipeline
-  pipeline:
-  - step: render-opentofu-workspace
-    functionRef:
-      name: function-go-templating
-    input:
-      apiVersion: gotemplating.fn.crossplane.io/v1beta1
-      kind: GoTemplate
-      source: Inline
-      inline:
-        template: |
-          apiVersion: opentofu.m.upbound.io/v1beta1
-          kind: Workspace
-          metadata:
-            annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: opentofu-workspace
-          spec:
-            providerConfigRef:
-              kind: ClusterProviderConfig
-              name: provider-opentofu
-            forProvider:
-              source: Remote
-              module: github.com/pauldotyu/crossplane-opentofu-demo//modules/resource-group?ref=main
-              vars:
-              - key: resource_group_name
-                value: {{ .observed.composite.resource.spec.parameters.name | quote }}
-              - key: location
-                value: {{ .observed.composite.resource.spec.parameters.location | quote }}
-              - key: requester_object_id
-                value: {{ .observed.composite.resource.spec.parameters.requesterObjectId | quote }}
-  - step: automatically-detect-ready
-    functionRef:
-      name: function-auto-ready
-EOF
-```
-
-```sh
-REQUESTER_OBJECT_ID=$(az ad signed-in-user show --query id -otsv)
-
-kubectl apply -f - <<EOF
-apiVersion: platform.example.org/v1alpha1
-kind: XResourceGroupRequest
-metadata:
-  name: rg-demo
-spec:
-  parameters:
-    name: rg-demo
-    location: westus3
-    requesterObjectId: "${REQUESTER_OBJECT_ID}"
-EOF
-```
-
-```sh
-kubectl wait --for=condition=Ready xresourcegrouprequest rg-demo --timeout=300s
-```
-
-```sh
-kubectl describe xresourcegrouprequest rg-demo
-kubectl get workspace
-```
-
-```sh
-az group show \
---name rg-demo \
---query '{name:name,location:location,provisioningState:properties.provisioningState}' \
--o yaml
-```
-
-```sh
-kubectl delete xresourcegrouprequest rg-demo
-```
-
-```sh
-az group show --name rg-demo
+az group show --name rg-tofu-test
 ```
 
 ## Platform setup
@@ -379,27 +287,22 @@ kubectl apply -f https://raw.githubusercontent.com/pauldotyu/crossplane-opentofu
 
 From this point on, navigate to Backstage and import the following templates:
 
-- [https://github.com/pauldotyu/backstage/blob/main/templates/create-agent-environment/template.yaml](https://github.com/pauldotyu/backstage/blob/main/templates/create-agent-environment/template.yaml)
-- [https://github.com/pauldotyu/backstage/blob/main/templates/delete-agent-environment/template.yaml](https://github.com/pauldotyu/backstage/blob/main/templates/delete-agent-environment/template.yaml)
-- [https://github.com/pauldotyu/backstage/blob/main/templates/create-maf-app/template.yaml](https://github.com/pauldotyu/backstage/blob/main/templates/create-maf-app/template.yaml)
+- `https://github.com/pauldotyu/backstage/blob/main/templates/create-agent-environment/template.yaml`
+- `https://github.com/pauldotyu/backstage/blob/main/templates/delete-agent-environment/template.yaml`
+- `https://github.com/pauldotyu/backstage/blob/main/templates/create-maf-app/template.yaml`
 
 ## Teardown
 
-Delete any Crossplane-managed requests and workspaces first, and wait for their
-external Azure resources to be deleted while the providers are still running.
+Delete any Crossplane-managed requests and workspaces first, and wait for their external Azure resources to be deleted while the providers are still running.
 
-Uninstall Backstage and delete its ExternalSecret and SecretStore while External
-Secrets Operator is still running. These resources were installed manually, so
-Terraform does not manage their deletion order.
+Uninstall Backstage and delete its ExternalSecret and SecretStore while External Secrets Operator is still running. These resources were installed manually, so Terraform does not manage their deletion order.
 
 ```sh
 helm uninstall backstage -n backstage
 kubectl delete -f kubernetes/external-secrets.yaml --timeout=120s
 ```
 
-If deletion times out, resolve the operator or finalizer issue before continuing.
-Check for other ExternalSecrets and SecretStores and remove any demo resources
-that still require operator cleanup.
+If deletion times out, resolve the operator or finalizer issue before continuing. Check for other ExternalSecrets and SecretStores and remove any demo resources that still require operator cleanup.
 
 ```sh
 kubectl get externalsecrets.external-secrets.io,secretstores.external-secrets.io -A
@@ -411,21 +314,13 @@ Then destroy the Terraform-managed infrastructure:
 terraform destroy
 ```
 
-The External Secrets Helm release retains its CRDs using
-`helm.sh/resource-policy: keep`. This prevents Helm from deleting CRDs and their
-custom resources at the same time as the operator responsible for processing
-their finalizers. cert-manager also retains its CRDs. Helm information messages
-about these retained resources are expected. When destroying the whole AKS
-cluster, the retained CRDs disappear with the cluster.
+The External Secrets Helm release retains its CRDs using `helm.sh/resource-policy: keep`. This prevents Helm from deleting CRDs and their custom resources at the same time as the operator responsible for processing their finalizers. cert-manager also retains its CRDs. Helm information messages about these retained resources are expected. When destroying the whole AKS cluster, the retained CRDs disappear with the cluster.
 
-For an existing deployment, apply the retention setting with `terraform apply`
-before uninstalling the release. Changing the configuration alone does not update
-the installed Helm release.
+For an existing deployment, apply the retention setting with `terraform apply` before uninstalling the release. Changing the configuration alone does not update the installed Helm release.
 
 ### External Secrets uninstall timeout
 
-If an uninstall has already removed the operator, check whether an ExternalSecret
-and its CRD are stuck deleting:
+If an uninstall has already removed the operator, check whether an ExternalSecret and its CRD are stuck deleting:
 
 ```sh
 kubectl get crd externalsecrets.external-secrets.io \
@@ -435,15 +330,10 @@ kubectl get externalsecrets.external-secrets.io -A \
 kubectl get pods -n external-secrets
 ```
 
-A terminating CRD with `InstanceDeletionInProgress` and an ExternalSecret with
-`externalsecrets.external-secrets.io/externalsecret-cleanup` indicate unfinished
-operator cleanup. Increasing the Helm timeout will not resolve an orphaned
-finalizer when the operator is gone.
+A terminating CRD with `InstanceDeletionInProgress` and an ExternalSecret with `externalsecrets.external-secrets.io/externalsecret-cleanup` indicate unfinished operator cleanup. Increasing the Helm timeout will not resolve an orphaned finalizer when the operator is gone.
 
-The retention setting prevents this deletion race on future uninstalls, but does
-not repair a CRD already terminating. Recovery requires restoring an operator
-capable of completing cleanup or explicitly approving targeted removal of the
-orphaned finalizer after reviewing its cleanup responsibilities. Removing a
-finalizer bypasses that cleanup and may leave generated Kubernetes Secrets behind.
-Do not remove the CRD's cleanup finalizer or delete Terraform state to hide the
-failure.
+The retention setting prevents this deletion race on future uninstalls, but does not repair a CRD already terminating. Recovery requires restoring an operator capable of completing cleanup or explicitly approving targeted removal of the orphaned finalizer after reviewing its cleanup responsibilities. Removing a finalizer bypasses that cleanup and may leave generated Kubernetes Secrets behind. Do not remove the CRD's cleanup finalizer or delete Terraform state to hide the failure.
+
+## Resources
+
+- [Azure AKS App Routing with Gateway API, DNS, and TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls)

@@ -4,7 +4,7 @@ resource "azurerm_user_assigned_identity" "cert_manager" {
   name                = "cert-manager"
 }
 
-resource "azurerm_role_assignment" "cert_manager_dns_zone_contributor" {
+resource "azurerm_role_assignment" "cert_manager" {
   principal_id                     = azurerm_user_assigned_identity.cert_manager.principal_id
   scope                            = azurerm_dns_zone.example.id
   role_definition_name             = "DNS Zone Contributor"
@@ -46,12 +46,12 @@ resource "helm_release" "cert_manager" {
 
   depends_on = [
     azurerm_federated_identity_credential.cert_manager,
-    azurerm_role_assignment.cert_manager_dns_zone_contributor,
+    azurerm_role_assignment.cert_manager,
     azurerm_role_assignment.control_cluster_access,
   ]
 }
 
-resource "local_file" "cert_manager_cluster_issuer" {
+resource "local_file" "cert_manager" {
   filename = "kubernetes/cert-manager.yaml"
   content = templatefile("cert-manager.tmpl",
     {

@@ -140,7 +140,7 @@ resource "azurerm_kubernetes_cluster_extension" "argocd" {
   }
 }
 
-resource "local_file" "argo_cd" {
+resource "local_file" "argocd" {
   filename = "kubernetes/argo-cd.yaml"
   content = templatefile("argo-cd.tmpl",
     {
