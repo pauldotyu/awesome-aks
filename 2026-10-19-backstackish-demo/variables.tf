@@ -15,13 +15,11 @@ variable "tags" {
 variable "admin_email" {
   description = "The admin email to be used for cert-manager."
   type        = string
-  default     = "paul.d.yu@gmail.com"
 }
 
 variable "dns_zone_name" {
   description = "The DNS zone name to be created for Argo CD ingress."
   type        = string
-  default     = "paulyu.rocks"
 }
 
 variable "entra_group_name" {

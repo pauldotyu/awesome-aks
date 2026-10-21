@@ -98,7 +98,7 @@ Check the status of the certificate
 kubectl get certificate -n backstage backstage-tls
 ```
 
-Once the certificate is ready, you can access Backstage at `https://backstage.paulyu.rocks`.
+Once the certificate is ready, you can access Backstage at `https://backstage.<your-dns-zone-name>`.
 
 > If you encounter an issue logging in, check the Backstage pod logs to make sure the MicrosoftGraphOrgEntityProvider plugin has successfully synchronized users and groups from Microsoft Entra ID.
 
@@ -132,7 +132,7 @@ Check the status of the certificate
 kubectl get certificate -n argocd argocd-tls
 ```
 
-Once the certificate is ready, you can access Argo CD at `https://argocd.paulyu.rocks`.
+Once the certificate is ready, you can access Argo CD at `https://argocd.<your-dns-zone-name>`.
 
 ### Configure Crossplane
 
