@@ -1,4 +1,4 @@
-# BACK-ish Stack Demo
+# BACK-ish stack demo
 
 ## Environment setup
 
@@ -71,7 +71,7 @@ Install Backstage. The Helm chart will install the CertificateRequest and Gatewa
 
 ```sh
 helm upgrade --install backstage oci://ghcr.io/pauldotyu/charts/backstage \
---version 0.1.0-sha-afd05b4 \
+--version 0.1.0-sha-ab2519c \
 -n backstage \
 -f kubernetes/backstage-values.yaml
 ```
@@ -221,19 +221,19 @@ Verify that the resource group has been deleted in Azure.
 az group show --name rg-tofu-crossplane-test
 ```
 
-## Demo
+### Validate Crossplane + OpenTofu integration
 
 ```sh
 kubectl apply -f - <<'EOF'
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: xresourcegrouprequests.platform.example.org
+  name: xresourcegroup.platform.example.org
 spec:
   group: platform.example.org
   names:
-    kind: XResourceGroupRequest
-    plural: xresourcegrouprequests
+    kind: XResourceGroup
+    plural: xresourcegroups
   versions:
   - name: v1alpha1
     served: true
@@ -270,11 +270,11 @@ kubectl apply -f - <<'EOF'
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: xresourcegrouprequests.opentofu.platform.example.org
+  name: resource-group
 spec:
   compositeTypeRef:
     apiVersion: platform.example.org/v1alpha1
-    kind: XResourceGroupRequest
+    kind: XResourceGroup
   mode: Pipeline
   pipeline:
   - step: render-opentofu-workspace
@@ -318,35 +318,63 @@ kubectl apply -f - <<EOF
 apiVersion: platform.example.org/v1alpha1
 kind: XResourceGroupRequest
 metadata:
-  name: demo-rg-paul
+  name: rg-demo
 spec:
   parameters:
-    name: rg-demo-paul
+    name: rg-demo
     location: westus3
     requesterObjectId: "${REQUESTER_OBJECT_ID}"
 EOF
 ```
 
 ```sh
-kubectl wait --for=condition=Ready xresourcegrouprequest demo-rg-paul --timeout=300s
+kubectl wait --for=condition=Ready xresourcegrouprequest rg-demo --timeout=300s
 ```
 
 ```sh
-kubectl describe xresourcegrouprequest demo-rg-paul
+kubectl describe xresourcegrouprequest rg-demo
 kubectl get workspace
 ```
 
 ```sh
 az group show \
---name rg-demo-paul \
+--name rg-demo \
 --query '{name:name,location:location,provisioningState:properties.provisioningState}' \
 -o yaml
 ```
 
 ```sh
-kubectl delete xresourcegrouprequest demo-rg-paul
+kubectl delete xresourcegrouprequest rg-demo
 ```
 
 ```sh
-az group show --name rg-demo-paul
+az group show --name rg-demo
 ```
+
+## Platform setup
+
+Setup the platform API by applying the ArgoCD application manifest:
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/pauldotyu/crossplane-opentofu-demo/refs/heads/main/argocd/platform-api.yaml
+```
+
+What this does:
+
+- Watches `main`, recursively including anything under api/ to the platform.
+- Automatically syncs your XRD and compositions to the platform.
+- Restricts this project to only two resource types: CompositeResourceDefinition and Composition.
+- Disables automatic pruning so removing an API definition form Git does not automatically delete it from the cluster.
+
+```sh
+kubectl -n argocd get application platform-api \
+  -o custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status
+```
+
+Setup another Argo CD application that recursively checks for changes in the requests/agent-environments directory to build OpenTofu workspaces.
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/pauldotyu/crossplane-opentofu-demo/refs/heads/main/argocd/agent-environments.yaml
+```
+
+From this point on, navigate to Backstage and import templates and create new resources based on the imported templates.

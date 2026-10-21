@@ -1,3 +1,14 @@
+resource "azuread_group" "backstage_admins" {
+  display_name     = "backstage-admins"
+  security_enabled = true
+  owners           = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_group_member" "backstage_admins" {
+  group_object_id  = azuread_group.backstage_admins.object_id
+  member_object_id = data.azuread_client_config.current.object_id
+}
+
 resource "azuread_group" "backstage_users" {
   display_name     = "backstage-users"
   security_enabled = true
@@ -5,8 +16,9 @@ resource "azuread_group" "backstage_users" {
 }
 
 resource "azuread_group_member" "backstage_users" {
+  for_each         = toset(local.backstage_users)
   group_object_id  = azuread_group.backstage_users.object_id
-  member_object_id = data.azuread_client_config.current.object_id
+  member_object_id = each.key
 }
 
 resource "time_rotating" "backstage" {
@@ -123,11 +135,12 @@ resource "local_file" "backstage_values" {
   filename = "kubernetes/backstage-values.yaml"
   content = templatefile("backstage-values.tmpl",
     {
-      AZURE_CLIENT_ID     = azuread_application.backstage.client_id
-      AZURE_CLIENT_SECRET = tolist(azuread_application.backstage.password).0.value
-      AZURE_TENANT_ID     = data.azuread_client_config.current.tenant_id
-      AZURE_GROUP_ID      = azuread_group.backstage_users.object_id
-      DNS_ZONE_NAME       = azurerm_dns_zone.example.name
+      AZURE_CLIENT_ID      = azuread_application.backstage.client_id
+      AZURE_CLIENT_SECRET  = tolist(azuread_application.backstage.password).0.value
+      AZURE_TENANT_ID      = data.azuread_client_config.current.tenant_id
+      AZURE_ADMIN_GROUP_ID = azuread_group.backstage_admins.object_id
+      AZURE_USER_GROUP_ID  = azuread_group.backstage_users.object_id
+      DNS_ZONE_NAME        = azurerm_dns_zone.example.name
     }
   )
 }

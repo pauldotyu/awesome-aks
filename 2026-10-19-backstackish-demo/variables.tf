@@ -66,6 +66,18 @@ variable "backstage_github_token" {
   sensitive   = true
 }
 
+variable "backstage_user_object_ids" {
+  description = "A list of user object IDs to be added to the Backstage users group."
+  type        = list(string)
+  default     = []
+}
+
+variable "argocd_user_object_ids" {
+  description = "A list of user object IDs to be added to the Argo CD users group."
+  type        = list(string)
+  default     = []
+}
+
 variable "external_secrets_version" {
   description = "External Secrets Operator OCI chart version."
   type        = string

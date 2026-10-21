@@ -16,6 +16,8 @@ locals {
   random_unique_name = "${random_pet.example.id}${random_integer.example.result}"
   aks_control_name   = "aks-${local.random_name}-control"
   aks_shared_name    = "aks-${local.random_name}-worker"
+  backstage_users    = concat(var.backstage_user_object_ids, [data.azuread_client_config.current.object_id])
+  argocd_users       = concat(var.argocd_user_object_ids, [data.azuread_client_config.current.object_id])
 }
 
 resource "random_pet" "example" {

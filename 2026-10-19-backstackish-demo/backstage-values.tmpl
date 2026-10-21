@@ -9,6 +9,8 @@ gateway:
         name: letsencrypt-staging
         kind: ClusterIssuer
 
+existingSecret: backstage-secrets
+
 appConfig:
   app:
     baseUrl: https://backstage.${DNS_ZONE_NAME}
@@ -38,9 +40,11 @@ appConfig:
           clientId: ${AZURE_CLIENT_ID}
           clientSecret: ${AZURE_CLIENT_SECRET}
           userGroupMember:
-            filter: id eq '${AZURE_GROUP_ID}'
+            filter: id eq '${AZURE_USER_GROUP_ID}'
           group:
-            filter: id eq '${AZURE_GROUP_ID}'
+            filter: >-
+              id eq '${AZURE_USER_GROUP_ID}'
+              or id eq '${AZURE_ADMIN_GROUP_ID}'
           schedule:
             frequency: { minutes: 30 }
             timeout: { minutes: 3 }

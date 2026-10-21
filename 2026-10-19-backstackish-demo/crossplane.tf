@@ -65,10 +65,10 @@ resource "local_file" "crossplane_provider_opentofu" {
   content = templatefile("crossplane.tmpl",
     {
 
-      PROVISIONER_CLIENT_ID     = azurerm_user_assigned_identity.opentofu.client_id
-      AZURE_TENANT_ID           = data.azuread_client_config.current.tenant_id
-      AZURE_SUBSCRIPTION_ID     = data.azurerm_client_config.current.subscription_id
-      PROVIDER_OPENTOFU_VERSION = var.crossplane_provider_opentofu_version
+      PROVISIONER_CLIENT_ID          = azurerm_user_assigned_identity.opentofu.client_id
+      AZURE_TENANT_ID                = data.azuread_client_config.current.tenant_id
+      AZURE_SUBSCRIPTION_ID          = data.azurerm_client_config.current.subscription_id
+      PROVIDER_OPENTOFU_VERSION      = var.crossplane_provider_opentofu_version
       FUNCTION_GO_TEMPLATING_VERSION = var.crossplane_function_go_templating_version
       FUNCTION_AUTO_READY_VERSION    = var.crossplane_function_auto_ready_version
     }

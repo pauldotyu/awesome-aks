@@ -16,8 +16,9 @@ resource "azuread_group" "argocd_users" {
 }
 
 resource "azuread_group_member" "argocd_users" {
+  for_each         = toset(local.argocd_users)
   group_object_id  = azuread_group.argocd_users.object_id
-  member_object_id = data.azuread_client_config.current.object_id
+  member_object_id = each.value
 }
 
 resource "azuread_application" "argocd" {
