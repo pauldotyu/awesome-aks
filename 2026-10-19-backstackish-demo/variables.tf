@@ -58,6 +58,12 @@ variable "crossplane_function_auto_ready_version" {
   default     = "v0.7.1"
 }
 
+variable "crossplane_function_environment_configs_version" {
+  description = "The version of the Crossplane Environment Configs function."
+  type        = string
+  default     = "v0.9.0"
+}
+
 variable "backstage_github_token" {
   description = "The GitHub Personal Access Token (PAT) for Backstage."
   type        = string
@@ -80,4 +86,30 @@ variable "external_secrets_version" {
   description = "External Secrets Operator OCI chart version."
   type        = string
   default     = "2.0.1"
+}
+
+variable "model_deployment" {
+  description = "The model deployment"
+  type = object({
+    model = object({
+      format  = string
+      name    = string
+      version = string
+    })
+    sku = object({
+      name     = string
+      capacity = number
+    })
+  })
+  default = {
+    model = {
+      format  = "OpenAI"
+      name    = "gpt-5.4-mini"
+      version = "2026-03-17"
+    }
+    sku = {
+      name     = "GlobalStandard"
+      capacity = 500
+    }
+  }
 }

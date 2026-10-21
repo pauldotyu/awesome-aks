@@ -65,12 +65,20 @@ resource "local_file" "opentofu_provider" {
   content = templatefile("crossplane.tmpl",
     {
 
-      PROVISIONER_CLIENT_ID          = azurerm_user_assigned_identity.opentofu.client_id
-      AZURE_TENANT_ID                = data.azuread_client_config.current.tenant_id
-      AZURE_SUBSCRIPTION_ID          = data.azurerm_client_config.current.subscription_id
-      PROVIDER_OPENTOFU_VERSION      = var.crossplane_provider_opentofu_version
-      FUNCTION_GO_TEMPLATING_VERSION = var.crossplane_function_go_templating_version
-      FUNCTION_AUTO_READY_VERSION    = var.crossplane_function_auto_ready_version
+      PROVISIONER_CLIENT_ID                = azurerm_user_assigned_identity.opentofu.client_id
+      AZURE_TENANT_ID                      = data.azuread_client_config.current.tenant_id
+      AZURE_SUBSCRIPTION_ID                = data.azurerm_client_config.current.subscription_id
+      PROVIDER_OPENTOFU_VERSION            = var.crossplane_provider_opentofu_version
+      FUNCTION_GO_TEMPLATING_VERSION       = var.crossplane_function_go_templating_version
+      FUNCTION_AUTO_READY_VERSION          = var.crossplane_function_auto_ready_version
+      FUNCTION_ENVIRONMENT_CONFIGS_VERSION = var.crossplane_function_environment_configs_version
+      SHARED_CLUSTER_ID                    = azapi_resource.aks_worker.id
+      SHARED_CLUSTER_OIDC_ISSUER_URL       = azapi_resource.aks_worker.output.properties.oidcIssuerProfile.issuerURL
+      SHARED_CLUSTER_LOCATION              = azapi_resource.aks_worker.location
+      SHARED_MONITOR_WORKSPACE_ID          = azurerm_monitor_workspace.example.id
+      SHARED_LOG_ANALYTICS_WORKSPACE_ID    = azurerm_log_analytics_workspace.example.id
+      SHARED_MODEL_RESOURCE_ID             = azurerm_cognitive_account.example.id
+      SHARED_MODEL_RESOURCE_NAME           = azurerm_cognitive_account.example.name
     }
   )
 }
