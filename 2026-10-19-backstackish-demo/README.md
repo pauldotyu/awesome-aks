@@ -111,7 +111,7 @@ Install Backstage. The Helm chart will install the CertificateRequest and Gatewa
 
 ```sh
 helm upgrade --install backstage oci://ghcr.io/pauldotyu/charts/backstage \
---version 0.1.0-sha-3d2870a \
+--version 0.1.0-sha-7f877bc \
 -n backstage \
 -f kubernetes/backstage-values.yaml
 ```
