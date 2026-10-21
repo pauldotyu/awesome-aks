@@ -111,7 +111,7 @@ Install Backstage. The Helm chart will install the CertificateRequest and Gatewa
 
 ```sh
 helm upgrade --install backstage oci://ghcr.io/pauldotyu/charts/backstage \
---version 0.1.0-sha-6f1a9fd \
+--version 0.1.0-sha-3d2870a \
 -n backstage \
 -f kubernetes/backstage-values.yaml
 ```
@@ -264,7 +264,7 @@ az group show --name rg-tofu-test
 Setup the platform API by applying the ArgoCD application manifest:
 
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/pauldotyu/crossplane-opentofu-demo/refs/heads/main/argocd/platform-api.yaml
+kubectl apply -f https://raw.githubusercontent.com/pauldotyu/platform/refs/heads/main/argocd/platform-api.yaml
 ```
 
 What this does:
@@ -282,7 +282,7 @@ kubectl -n argocd get application platform-api \
 Setup another Argo CD application that recursively checks for changes in the requests/agent-environments directory to build OpenTofu workspaces.
 
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/pauldotyu/crossplane-opentofu-demo/refs/heads/main/argocd/agent-environments.yaml
+kubectl apply -f https://raw.githubusercontent.com/pauldotyu/platform/refs/heads/main/argocd/agent-environments.yaml
 ```
 
 From this point on, navigate to Backstage and import the following templates:
