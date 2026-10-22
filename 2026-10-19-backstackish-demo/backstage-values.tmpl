@@ -11,6 +11,11 @@ gateway:
 
 existingSecret: backstage-secrets
 
+# Read access to environments in this cluster. The namespace must already exist.
+agentEnvironments:
+  enabled: true
+  namespace: agent-environments
+
 appConfig:
   app:
     baseUrl: https://backstage.${DNS_ZONE_NAME}
@@ -48,3 +53,22 @@ appConfig:
           schedule:
             frequency: { minutes: 30 }
             timeout: { minutes: 3 }
+
+
+  kubernetes:
+    serviceLocatorMethod:
+      type: singleTenant
+    customResources:
+      - group: platform.example.org
+        apiVersion: v1alpha1
+        plural: xagentenvironments
+    # Fetch configured custom resources only, not unrelated workloads or Secrets.
+    objectTypes: []
+    clusterLocatorMethods:
+      - type: config
+        clusters:
+          - name: in-cluster
+            url: https://kubernetes.default.svc
+            # Omit serviceAccountToken to use the pod's service account.
+            authProvider: serviceAccount
+            skipMetricsLookup: true

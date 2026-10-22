@@ -85,93 +85,6 @@ Check the status of the ClusterIssuer
 kubectl get clusterissuer
 ```
 
-### Configure Backstage
-
-Create the namespace for Backstage
-
-```sh
-kubectl create namespace backstage
-```
-
-Create the secret store and external secrets for Backstage
-
-```sh
-kubectl apply -f kubernetes/external-secrets.yaml
-```
-
-> Source: [https://external-secrets.io/latest/provider/azure-key-vault/](https://external-secrets.io/latest/provider/azure-key-vault/)
-
-Make sure the secrets have synchronized successfully from Azure Key Vault before proceeding.
-
-```sh
-kubectl get secrets -n backstage backstage-secrets -oyaml
-```
-
-Install Backstage. The Helm chart will install the CertificateRequest and Gateway resources for Backstage.
-
-```sh
-helm upgrade --install backstage oci://ghcr.io/pauldotyu/charts/backstage \
---version 0.1.0-sha-7f877bc \
--n backstage \
--f kubernetes/backstage-values.yaml
-```
-
-Check the status of the Backstage gateway
-
-```sh
-kubectl get gateway -n backstage backstage
-```
-
-Wait a few moments for the gateway to be programmed, then get the IP address to create a DNS record for the Argo CD hostname
-
-```sh
-az network dns record-set a show \
---zone-name $DNS_ZONE_NAME \
---resource-group $RG_NAME \
---name backstage
-```
-
-Check the status of the certificate
-
-```sh
-kubectl get certificate -n backstage backstage-tls
-```
-
-Once the certificate is ready, you can access Backstage at `https://backstage.<your-dns-zone-name>`.
-
-> If you encounter an issue logging in, check the Backstage pod logs to make sure the MicrosoftGraphOrgEntityProvider plugin has successfully synchronized users and groups from Microsoft Entra ID.
-
-### Configure Argo CD
-
-Deploy Argo CD certificate request and gateway
-
-```sh
-kubectl apply -f kubernetes/argo-cd.yaml
-```
-
-Check the status of the Argo CD gateway
-
-```sh
-kubectl get gateway -n argocd argocd-gateway
-```
-
-Wait a few moments for the gateway to be programmed, then get the IP address to create a DNS record for the Argo CD hostname
-
-```sh
-az network dns record-set a show \
---zone-name $DNS_ZONE_NAME \
---resource-group $RG_NAME \
---name argocd
-```
-
-Check the status of the certificate
-
-```sh
-kubectl get certificate -n argocd argocd-tls
-```
-
-Once the certificate is ready, you can access Argo CD at `https://argocd.<your-dns-zone-name>`.
-
 ### Configure Crossplane
 
 Deploy the OpenTofu provider for Crossplane
@@ -258,6 +171,99 @@ Verify that the resource group has been deleted in Azure.
 ```sh
 az group show --name rg-tofu-test
 ```
+
+### Configure Argo CD
+
+Deploy Argo CD certificate request and gateway
+
+```sh
+kubectl apply -f kubernetes/argo-cd.yaml
+```
+
+Check the status of the Argo CD gateway
+
+```sh
+kubectl get gateway -n argocd argocd-gateway
+```
+
+Wait a few moments for the gateway to be programmed, then get the IP address to create a DNS record for the Argo CD hostname
+
+```sh
+az network dns record-set a show \
+--zone-name $DNS_ZONE_NAME \
+--resource-group $RG_NAME \
+--name argocd
+```
+
+Check the status of the certificate
+
+```sh
+kubectl get certificate -n argocd argocd-tls
+```
+
+Once the certificate is ready, you can access Argo CD at `https://argocd.<your-dns-zone-name>`.
+
+### Configure Backstage
+
+Create the namespace for Backstage
+
+```sh
+kubectl create namespace backstage
+```
+
+Create the secret store and external secrets for Backstage
+
+```sh
+kubectl apply -f kubernetes/external-secrets.yaml
+```
+
+> Source: [https://external-secrets.io/latest/provider/azure-key-vault/](https://external-secrets.io/latest/provider/azure-key-vault/)
+
+Make sure the secrets have synchronized successfully from Azure Key Vault before proceeding.
+
+```sh
+kubectl get secrets -n backstage backstage-secrets -oyaml
+```
+
+Create the namespace for agent environments that Backstage will need to access
+
+```sh
+kubectl create namespace agent-environments
+```
+
+Install Backstage. The Helm chart will install the CertificateRequest and Gateway resources for Backstage.
+
+```sh
+helm upgrade --install backstage oci://ghcr.io/pauldotyu/charts/backstage \
+--version 0.1.0-sha-8ff3d64 \
+-n backstage \
+-f kubernetes/backstage-values.yaml
+```
+
+Check the status of the Backstage gateway
+
+```sh
+kubectl get gateway -n backstage backstage
+```
+
+Wait a few moments for the gateway to be programmed, then get the IP address to create a DNS record for the Backstage hostname
+
+```sh
+az network dns record-set a show \
+--zone-name $DNS_ZONE_NAME \
+--resource-group $RG_NAME \
+--name backstage
+```
+
+Check the status of the certificate
+
+```sh
+kubectl get certificate -n backstage backstage-tls
+```
+
+Once the certificate is ready, you can access Backstage at `https://backstage.<your-dns-zone-name>`.
+
+> If you encounter an issue logging in, check the Backstage pod logs to make sure the MicrosoftGraphOrgEntityProvider plugin has successfully synchronized users and groups from Microsoft Entra ID.
 
 ## Platform setup
 
