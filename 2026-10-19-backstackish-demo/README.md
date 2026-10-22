@@ -305,13 +305,7 @@ Uninstall Backstage and delete its ExternalSecret and SecretStore while External
 
 ```sh
 helm uninstall backstage -n backstage
-kubectl delete -f kubernetes/external-secrets.yaml --timeout=120s
-```
-
-If deletion times out, resolve the operator or finalizer issue before continuing. Check for other ExternalSecrets and SecretStores and remove any demo resources that still require operator cleanup.
-
-```sh
-kubectl get externalsecrets.external-secrets.io,secretstores.external-secrets.io -A
+kubectl delete -f kubernetes/external-secrets.yaml --wait=false
 ```
 
 Then destroy the Terraform-managed infrastructure:
