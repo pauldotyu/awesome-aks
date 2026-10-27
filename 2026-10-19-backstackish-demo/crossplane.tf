@@ -80,6 +80,8 @@ resource "local_file" "opentofu_provider" {
       SHARED_LOG_ANALYTICS_WORKSPACE_ID    = azurerm_log_analytics_workspace.example.id
       SHARED_MODEL_RESOURCE_ID             = azurerm_cognitive_account.example.id
       SHARED_MODEL_RESOURCE_NAME           = azurerm_cognitive_account.example.name
+      SHARED_MODEL_DEPLOYMENT_NAME         = var.model_deployment.model.name
+      PLATFORM_MODULE_REVISION             = var.platform_module_revision
     }
   )
 }

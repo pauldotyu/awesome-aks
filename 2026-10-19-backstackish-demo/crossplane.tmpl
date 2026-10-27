@@ -10,6 +10,9 @@ data:
   logAnalyticsWorkspaceId: "${SHARED_LOG_ANALYTICS_WORKSPACE_ID}"
   modelResourceId: "${SHARED_MODEL_RESOURCE_ID}"
   modelResourceName: "${SHARED_MODEL_RESOURCE_NAME}"
+  modelDeploymentName: "${SHARED_MODEL_DEPLOYMENT_NAME}"
+  # Commit SHA (preferred) or tag of pauldotyu/platform. Bump it on purpose to roll out module changes.
+  moduleRevision: "${PLATFORM_MODULE_REVISION}"
 ---
 apiVersion: pkg.crossplane.io/v1beta1
 kind: DeploymentRuntimeConfig
