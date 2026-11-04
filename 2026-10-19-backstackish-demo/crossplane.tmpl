@@ -91,3 +91,14 @@ metadata:
   labels: {app.kubernetes.io/part-of: prel37}
 spec:
   package: xpkg.crossplane.io/crossplane-contrib/function-environment-configs:${FUNCTION_ENVIRONMENT_CONFIGS_VERSION}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: crossplane-argo-delivery
+  labels:
+    rbac.crossplane.io/aggregate-to-crossplane: "true"
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [applications, appprojects]
+    verbs: [get, list, watch, create, update, patch, delete]

@@ -34,13 +34,15 @@ Get the output values
 ```sh
 read -r \
   RG_NAME \
-  AKS_NAME \
+  AKS_CONTROL_NAME \
+  AKS_WORKER_NAME \
   DNS_ZONE_NAME \
   DNS_NAME_SERVERS <<< "$(terraform output -json | jq -r \
     '[.rg_name.value,
-      .aks_name.value,
+      .aks_control_name.value,
+      .aks_worker_name.value,
       .dns_zone_name.value,
-      (.dns_name_servers.value | join(" "))] | @tsv')"
+      (.dns_name_servers.value | join(" "))] | @tsv')
 ```
 
 Print the DNS zone name servers then make sure they are correctly configured in your DNS provider.
@@ -60,7 +62,7 @@ dig +short NS $DNS_ZONE_NAME
 Connect to the cluster
 
 ```sh
-az aks get-credentials -n $AKS_NAME -g $RG_NAME
+az aks get-credentials -n $AKS_CONTROL_NAME -g $RG_NAME
 ```
 
 ### Configure external-dns
@@ -170,6 +172,30 @@ Verify that the resource group has been deleted in Azure.
 
 ```sh
 az group show --name rg-tofu-test
+```
+
+### Workload-cluster provider configuration
+
+The agent-environment Composition requires access to the workload cluster so that it can create service accounts and config maps in the workload cluster. Installing `provider-kubernetes` alone does not configure its connection to the workload cluster. So you must create a kubeconfig secret and a corresponding `ClusterProviderConfig` to enable the connection.
+
+Apply the `ClusterProviderConfig` to enable Crossplane to connect to the workload cluster:
+
+```bash
+kubectl apply -f kubernetes/workload-kubernetes.yaml
+```
+
+Generate the kubeconfig for the workload cluster and create a secret for Crossplane to use:
+
+```bash
+az aks get-credentials -g $RG_NAME -n $AKS_WORKER_NAME --format exec --file /tmp/worker.kubeconfig
+kubectl -n crossplane-system create secret generic workload-kubeconfig --from-file=kubeconfig=/tmp/worker.kubeconfig
+rm /tmp/worker.kubeconfig
+```
+
+Ensure it exists and is configured to authenticate to the workload cluster with the required permissions:
+
+```bash
+kubectl get clusterproviderconfigs.kubernetes.m.crossplane.io workload-kubernetes
 ```
 
 ### Configure Argo CD

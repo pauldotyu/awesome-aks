@@ -59,6 +59,26 @@ resource "azurerm_federated_identity_credential" "opentofu" {
   subject                   = "system:serviceaccount:crossplane-system:provider-opentofu"
 }
 
+resource "azurerm_user_assigned_identity" "provider_kubernetes" {
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  name                = "provider-kubernetes"
+}
+
+resource "azurerm_federated_identity_credential" "provider_kubernetes" {
+  user_assigned_identity_id = azurerm_user_assigned_identity.provider_kubernetes.id
+  name                      = "provider-kubernetes"
+  issuer                    = azurerm_kubernetes_cluster.control.oidc_issuer_url
+  audience                  = ["api://AzureADTokenExchange"]
+  subject                   = "system:serviceaccount:crossplane-system:provider-kubernetes"
+}
+
+resource "azurerm_role_assignment" "provider_kubernetes_worker_writer" {
+  principal_id                     = azurerm_user_assigned_identity.provider_kubernetes.principal_id
+  scope                            = azapi_resource.aks_worker.id
+  role_definition_name             = "Azure Kubernetes Service RBAC Writer"
+  skip_service_principal_aad_check = true
+}
 
 resource "local_file" "opentofu_provider" {
   filename = "kubernetes/crossplane.yaml"
@@ -82,6 +102,7 @@ resource "local_file" "opentofu_provider" {
       SHARED_MODEL_RESOURCE_NAME           = azurerm_cognitive_account.example.name
       SHARED_MODEL_DEPLOYMENT_NAME         = var.model_deployment.model.name
       PLATFORM_MODULE_REVISION             = var.platform_module_revision
+      PROVIDER_KUBERNETES_CLIENT_ID        = azurerm_user_assigned_identity.provider_kubernetes.client_id
     }
   )
 }
@@ -99,4 +120,12 @@ resource "local_file" "opentofu_state" {
       CONTAINER_NAME        = azurerm_storage_container.opentofu.name
     }
   )
+}
+
+resource "local_file" "workload_kubernetes" {
+  filename = "kubernetes/workload-kubernetes.yaml"
+  content = templatefile("workload-kubernetes.tmpl", {
+    PROVIDER_KUBERNETES_CLIENT_ID = azurerm_user_assigned_identity.provider_kubernetes.client_id
+    AZURE_TENANT_ID               = data.azurerm_client_config.current.tenant_id
+  })
 }

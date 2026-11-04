@@ -69,3 +69,24 @@ provider "helm" {
     }
   }
 }
+
+
+provider "helm" {
+  alias = "worker"
+  kubernetes = {
+    host                   = local.worker_kubeconfig.clusters[0].cluster.server
+    cluster_ca_certificate = base64decode(local.worker_kubeconfig.clusters[0].cluster["certificate-authority-data"])
+
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "kubelogin"
+      args = [
+        "get-token",
+        "--login",
+        "azurecli",
+        "--server-id",
+        "6dae42f8-4368-4678-94ff-3960e28e3630"
+      ]
+    }
+  }
+}

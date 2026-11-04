@@ -12,12 +12,14 @@ locals {
   # Application permissions used by the catalog msgraph provider to import users and groups
   msgraph_app_roles = ["User.Read.All", "GroupMember.Read.All", "Group.Read.All"]
 
-  random_name        = random_pet.example.id
-  random_unique_name = "${random_pet.example.id}${random_integer.example.result}"
-  aks_control_name   = "aks-${local.random_name}-control"
-  aks_worker_name    = "aks-${local.random_name}-worker"
-  backstage_users    = concat(var.backstage_user_object_ids, [data.azuread_client_config.current.object_id])
-  argocd_users       = concat(var.argocd_user_object_ids, [data.azuread_client_config.current.object_id])
+  random_name                   = random_pet.example.id
+  random_unique_name            = "${random_pet.example.id}${random_integer.example.result}"
+  aks_control_name              = "aks-${local.random_name}-control"
+  aks_worker_name               = "aks-${local.random_name}-worker"
+  backstage_users               = concat(var.backstage_user_object_ids, [data.azuread_client_config.current.object_id])
+  argocd_users                  = concat(var.argocd_user_object_ids, [data.azuread_client_config.current.object_id])
+  worker_cluster_ca_certificate = yamldecode(base64decode(azapi_resource_action.get_worker_cluster_creds.output.kubeconfigs[0].value)).clusters[0].cluster["certificate-authority-data"]
+  worker_kubeconfig             = yamldecode(base64decode(azapi_resource_action.get_worker_cluster_creds.output.kubeconfigs[0].value))
 }
 
 resource "random_pet" "example" {

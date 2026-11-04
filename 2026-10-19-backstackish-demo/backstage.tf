@@ -132,7 +132,7 @@ resource "azurerm_key_vault_secret" "backstage_github_token" {
 }
 
 resource "local_file" "backstage_values" {
-  filename = "kubernetes/backstage-values.yaml"
+  filename = "kubernetes/control/backstage/values.yaml"
   content = templatefile("backstage-values.tmpl",
     {
       AZURE_CLIENT_ID      = azuread_application.backstage.client_id

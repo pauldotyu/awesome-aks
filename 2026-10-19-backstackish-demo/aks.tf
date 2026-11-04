@@ -156,3 +156,23 @@ resource "azurerm_role_assignment" "worker_cluster_access" {
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
   scope                = azapi_resource.aks_worker.id
 }
+
+resource "azapi_resource_action" "get_worker_cluster_creds" {
+  type                   = azapi_resource.aks_worker.type
+  resource_id            = azapi_resource.aks_worker.id
+  action                 = "listClusterUserCredential"
+  response_export_values = ["*"]
+}
+
+resource "azapi_update_resource" "aks_ds_ns_exclusion" {
+  type        = "Microsoft.ContainerService/deploymentSafeguards@2025-05-02-preview"
+  resource_id = "${azapi_resource.aks_worker.id}/providers/Microsoft.ContainerService/deploymentSafeguards/default"
+
+  body = {
+    properties = {
+      excludedNamespaces = [
+        "cert-manager",
+      ]
+    }
+  }
+}

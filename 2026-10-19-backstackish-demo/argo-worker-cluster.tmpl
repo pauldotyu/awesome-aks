@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-worker
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+stringData:
+  name: worker
+  server: "${WORKER_SERVER}"
+  config: |
+    {
+      "execProviderConfig": {
+        "command": "argocd-k8s-auth",
+        "args": ["azure"],
+        "apiVersion": "client.authentication.k8s.io/v1beta1",
+        "env": {
+          "AAD_ENVIRONMENT_NAME": "AzurePublicCloud",
+          "AAD_LOGIN_METHOD": "workloadidentity",
+          "AZURE_CLIENT_ID": "${ARGO_CLIENT_ID}",
+          "AZURE_TENANT_ID": "${AZURE_TENANT_ID}"
+        }
+      },
+      "tlsClientConfig": {"insecure": false, "caData": "${WORKER_CA}"}
+    }

@@ -1,0 +1,63 @@
+---
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: ClusterProviderConfig
+metadata:
+  name: control-kubernetes
+spec:
+  credentials:
+    source: InjectedIdentity
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: provider-kubernetes-argo
+  namespace: argocd
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [applications, appprojects]
+    verbs: [get, list, watch, create, update, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: provider-kubernetes-argo
+  namespace: argocd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: provider-kubernetes-argo
+subjects:
+  - kind: ServiceAccount
+    name: provider-kubernetes
+    namespace: crossplane-system
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: workload-identity
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  credentials: |
+    {
+      "clientId": "${PROVIDER_KUBERNETES_CLIENT_ID}",
+      "tenantId": "${AZURE_TENANT_ID}",
+      "federatedTokenFile": "/var/run/secrets/azure/tokens/azure-identity-token",
+      "authorityHost": "https://login.microsoftonline.com/",
+      "serverId": "6dae42f8-4368-4678-94ff-3960e28e3630"
+    }
+---
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: ClusterProviderConfig
+metadata:
+  name: workload-kubernetes
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: crossplane-system
+      name: workload-kubeconfig
+      key: kubeconfig
+  identity:
+    type: AzureWorkloadIdentityCredentials
+    source: InjectedIdentity
